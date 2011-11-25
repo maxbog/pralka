@@ -59,12 +59,12 @@ public class Pump extends SimulationThread {
                     if(environment.waterLevelTooLow())
                         state = State.BROKEN;
                     else
-                        environment.increaseWaterLevel(litersPerSecond);
+                        environment.increaseWaterLevel(litersPerSecond*getTimeDelta());
                 case PUMPING_OUTSIDE:
                     if(environment.waterLevelTooLow())
                         state = State.BROKEN;
                     else
-                        environment.decreaseWaterLevel(litersPerSecond);
+                        environment.decreaseWaterLevel(litersPerSecond*getTimeDelta());
             }
         }
     }
