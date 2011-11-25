@@ -7,7 +7,7 @@ public class TemperatureSensor {
         this.environment = environment;
     }
     
-    public int getTemperature() {
+    public double getTemperature() {
         return environment.getWaterTemperature();
     }
     
