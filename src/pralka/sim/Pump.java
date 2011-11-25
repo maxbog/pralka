@@ -1,47 +1,53 @@
 package pralka.sim;
 
-public class Pump extends SimulationThread {
-    
+public class Pump extends BreakableComponent {
+
     private static enum State {
+
         STOPPED,
         PUMPING_INSIDE,
-        PUMPING_OUTSIDE,
-        BROKEN
+        PUMPING_OUTSIDE
     }
-    
+
     public static enum Direction {
+
         OUTSIDE,
         INSIDE
     }
-    
     private Environment environment;
     private State state;
     private static final double litersPerSecond = 1.;
 
     public Pump(Environment environment) {
+        super(10);
         this.environment = environment;
         this.state = State.STOPPED;
     }
-    
+
     public synchronized void startPumping(Direction direction) {
-        switch(state) {
+        if(broken())
+            return;
+        switch (state) {
             case STOPPED:
-                if(direction == Direction.INSIDE)
+                if (direction == Direction.INSIDE) {
                     state = State.PUMPING_INSIDE;
-                else
+                } else {
                     state = State.PUMPING_OUTSIDE;
+                }
                 break;
             case PUMPING_INSIDE:
-                state = State.BROKEN;
+                breakInstantly();
                 break;
             case PUMPING_OUTSIDE:
-                state = State.BROKEN;
+                breakInstantly();
                 break;
         }
     }
-    
+
     public synchronized void stopPumping() {
-        switch(state) {
+        if(broken())
+            return;
+        switch (state) {
             case PUMPING_INSIDE:
                 state = State.STOPPED;
                 break;
@@ -50,21 +56,25 @@ public class Pump extends SimulationThread {
                 break;
         }
     }
-    
+
     @Override
-    public synchronized void run() {
-        while(simulationRunning()) {
-            switch(state) {
-                case PUMPING_INSIDE:
-                    if(environment.waterLevelTooLow())
-                        state = State.BROKEN;
-                    else
-                        environment.increaseWaterLevel(litersPerSecond*getTimeDelta());
-                case PUMPING_OUTSIDE:
-                    if(environment.waterLevelTooLow())
-                        state = State.BROKEN;
-                    else
-                        environment.decreaseWaterLevel(litersPerSecond*getTimeDelta());
+    public void run() {
+        while (simulationRunning()) {
+            synchronized (this) {
+                switch (state) {
+                    case PUMPING_INSIDE:
+                        if (environment.waterLevelTooLow()) {
+                            startBreakingTimer();
+                        } else {
+                            environment.increaseWaterLevel(litersPerSecond * getTimeDelta());
+                        }
+                    case PUMPING_OUTSIDE:
+                        if (environment.waterLevelTooLow()) {
+                            startBreakingTimer();
+                        } else {
+                            environment.decreaseWaterLevel(litersPerSecond * getTimeDelta());
+                        }
+                }
             }
         }
     }
