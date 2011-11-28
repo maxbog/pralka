@@ -20,9 +20,13 @@ public class ControlUnit {
     private Substate currentSubstate;
   //  private Pralka pralka;
     
-    public ControlUnit() {
-        
+    private WashingMachine washingMachine;
+
+    public ControlUnit(WashingMachine washingMachine) {
+        this.washingMachine = washingMachine;
     }
+    
+    
     
     public void setNewProgram(Program p) {
         
