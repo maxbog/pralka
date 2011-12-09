@@ -5,7 +5,7 @@
 package pralka.sim;
 
 
-public class ControlUnit {
+public class ControlUnit extends SimulationThread {
     
    public enum Substate {
        IDLE,
@@ -43,7 +43,8 @@ public class ControlUnit {
         
     }
     
-    public void Run() {
+    @Override
+    public void simulationStep() {
         
         switch(currentSubstate) {
             case IDLE:

@@ -34,6 +34,6 @@ public class ComponentFactory {
     }
     
     public ControlUnit createControlUnit(WashingMachine washingMachine) {
-        return new ControlUnit(washingMachine);
+        return simulation.registeringThread(new ControlUnit(washingMachine));
     }
 }

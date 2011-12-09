@@ -1,10 +1,32 @@
 package pralka.ui;
 
+import com.jgoodies.binding.PresentationModel;
+import com.jgoodies.binding.adapter.Bindings;
+import pralka.sim.Programmer;
+
 public class UserInterfacePanel extends javax.swing.JPanel {
 
+    Programmer programmer;
+    
     /** Creates new form UserInterfacePanel */
     public UserInterfacePanel() {
         initComponents();
+        
+        programmer = new Programmer();
+        
+        initDataBindings();
+    }
+    
+    private void initDataBindings() {
+        PresentationModel<Programmer> model = new PresentationModel<Programmer>(programmer);
+        
+        // wybór programu
+        Bindings.bind(rbtnCotton, model.getModel(Programmer.PROPERTYNAME_CHOSEN_PROGRAM), Programmer.PredefinedProgram.PROGRAM_COTTON);
+        Bindings.bind(rbtnWool, model.getModel(Programmer.PROPERTYNAME_CHOSEN_PROGRAM), Programmer.PredefinedProgram.PROGRAM_WOOL);
+        Bindings.bind(rbtnDelicate, model.getModel(Programmer.PROPERTYNAME_CHOSEN_PROGRAM), Programmer.PredefinedProgram.PROGRAM_DELICATE);
+        Bindings.bind(rbtnFast, model.getModel(Programmer.PROPERTYNAME_CHOSEN_PROGRAM), Programmer.PredefinedProgram.PROGRAM_FAST);
+        Bindings.bind(rbtnHandWash, model.getModel(Programmer.PROPERTYNAME_CHOSEN_PROGRAM), Programmer.PredefinedProgram.PROGRAM_HANDWASH);
+        Bindings.bind(rbtnCustom, model.getModel(Programmer.PROPERTYNAME_CHOSEN_PROGRAM), Programmer.PredefinedProgram.PROGRAM_CUSTOM);
     }
 
     /** This method is called from within the constructor to
@@ -17,105 +39,104 @@ public class UserInterfacePanel extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jButton5 = new javax.swing.JButton();
-        jTextField4 = new javax.swing.JTextField();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        btnStart = new javax.swing.JButton();
+        btnPause = new javax.swing.JButton();
+        txtStatus = new javax.swing.JTextField();
+        btnTemperature = new javax.swing.JButton();
+        btnSpeed = new javax.swing.JButton();
+        txtTemperature = new javax.swing.JTextField();
+        txtSpeed = new javax.swing.JTextField();
+        btnWashingTime = new javax.swing.JButton();
+        txtWashingTime = new javax.swing.JTextField();
+        chkCradle = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
-        jRadioButton3 = new javax.swing.JRadioButton();
-        jRadioButton4 = new javax.swing.JRadioButton();
-        jRadioButton5 = new javax.swing.JRadioButton();
-        jRadioButton6 = new javax.swing.JRadioButton();
-        jCheckBox2 = new javax.swing.JCheckBox();
+        rbtnCotton = new javax.swing.JRadioButton();
+        rbtnWool = new javax.swing.JRadioButton();
+        rbtnDelicate = new javax.swing.JRadioButton();
+        rbtnFast = new javax.swing.JRadioButton();
+        rbtnHandWash = new javax.swing.JRadioButton();
+        rbtnCustom = new javax.swing.JRadioButton();
+        chkAdditionalWash = new javax.swing.JCheckBox();
 
         setLayout(new java.awt.GridBagLayout());
 
-        jButton1.setText("Start");
+        btnStart.setText("Start");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        add(jButton1, gridBagConstraints);
+        add(btnStart, gridBagConstraints);
 
-        jButton2.setText("Pauza");
+        btnPause.setText("Pauza");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        add(jButton2, gridBagConstraints);
+        add(btnPause, gridBagConstraints);
 
-        jTextField1.setText("jTextField1");
-        jTextField1.setMinimumSize(new java.awt.Dimension(600, 20));
-        jTextField1.setPreferredSize(new java.awt.Dimension(650, 20));
+        txtStatus.setEditable(false);
+        txtStatus.setMinimumSize(new java.awt.Dimension(600, 20));
+        txtStatus.setPreferredSize(new java.awt.Dimension(650, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        add(jTextField1, gridBagConstraints);
+        add(txtStatus, gridBagConstraints);
 
-        jButton3.setText("Temperatura");
+        btnTemperature.setText("Temperatura");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        add(jButton3, gridBagConstraints);
+        add(btnTemperature, gridBagConstraints);
 
-        jButton4.setText("Liczba obrotów/s");
+        btnSpeed.setText("Prędkość silnika");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        add(jButton4, gridBagConstraints);
+        add(btnSpeed, gridBagConstraints);
 
-        jTextField2.setText("jTextField2");
-        jTextField2.setMinimumSize(new java.awt.Dimension(60, 20));
-        jTextField2.setPreferredSize(new java.awt.Dimension(60, 20));
+        txtTemperature.setEditable(false);
+        txtTemperature.setMinimumSize(new java.awt.Dimension(60, 20));
+        txtTemperature.setPreferredSize(new java.awt.Dimension(60, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        add(jTextField2, gridBagConstraints);
+        add(txtTemperature, gridBagConstraints);
 
-        jTextField3.setText("jTextField3");
-        jTextField3.setMinimumSize(new java.awt.Dimension(60, 20));
-        jTextField3.setPreferredSize(new java.awt.Dimension(60, 20));
+        txtSpeed.setEditable(false);
+        txtSpeed.setMinimumSize(new java.awt.Dimension(60, 20));
+        txtSpeed.setPreferredSize(new java.awt.Dimension(60, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        add(jTextField3, gridBagConstraints);
+        add(txtSpeed, gridBagConstraints);
 
-        jButton5.setText("Czas prania");
+        btnWashingTime.setText("Czas prania");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        add(jButton5, gridBagConstraints);
+        add(btnWashingTime, gridBagConstraints);
 
-        jTextField4.setText("jTextField4");
-        jTextField4.setMinimumSize(new java.awt.Dimension(60, 20));
-        jTextField4.setPreferredSize(new java.awt.Dimension(60, 20));
+        txtWashingTime.setEditable(false);
+        txtWashingTime.setMinimumSize(new java.awt.Dimension(60, 20));
+        txtWashingTime.setPreferredSize(new java.awt.Dimension(60, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        add(jTextField4, gridBagConstraints);
+        add(txtWashingTime, gridBagConstraints);
 
-        jCheckBox1.setText("Ruchy kołyskowe");
+        chkCradle.setText("Ruchy kołyskowe");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
-        add(jCheckBox1, gridBagConstraints);
+        add(chkCradle, gridBagConstraints);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Programy"));
         jPanel1.setMinimumSize(new java.awt.Dimension(600, 70));
@@ -123,97 +144,91 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         jPanel1.setPreferredSize(new java.awt.Dimension(650, 69));
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
-        buttonGroup1.add(jRadioButton1);
-        jRadioButton1.setText("Bawełna/synteyki");
-        jRadioButton1.setMaximumSize(null);
-        jRadioButton1.setMinimumSize(new java.awt.Dimension(110, 23));
-        jRadioButton1.setPreferredSize(new java.awt.Dimension(110, 23));
+        rbtnCotton.setSelected(true);
+        rbtnCotton.setText("Bawełna/synteyki");
+        rbtnCotton.setMaximumSize(null);
+        rbtnCotton.setMinimumSize(new java.awt.Dimension(110, 23));
+        rbtnCotton.setPreferredSize(new java.awt.Dimension(110, 23));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jRadioButton1, gridBagConstraints);
+        jPanel1.add(rbtnCotton, gridBagConstraints);
 
-        buttonGroup1.add(jRadioButton2);
-        jRadioButton2.setText("Wełna");
-        jRadioButton2.setMaximumSize(null);
-        jRadioButton2.setMinimumSize(new java.awt.Dimension(110, 23));
-        jRadioButton2.setPreferredSize(new java.awt.Dimension(110, 23));
+        rbtnWool.setText("Wełna");
+        rbtnWool.setMaximumSize(null);
+        rbtnWool.setMinimumSize(new java.awt.Dimension(110, 23));
+        rbtnWool.setPreferredSize(new java.awt.Dimension(110, 23));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jRadioButton2, gridBagConstraints);
+        jPanel1.add(rbtnWool, gridBagConstraints);
 
-        buttonGroup1.add(jRadioButton3);
-        jRadioButton3.setText("Tkaniny delikatne");
-        jRadioButton3.setMaximumSize(null);
-        jRadioButton3.setMinimumSize(new java.awt.Dimension(110, 23));
-        jRadioButton3.setPreferredSize(new java.awt.Dimension(110, 23));
+        rbtnDelicate.setText("Tkaniny delikatne");
+        rbtnDelicate.setMaximumSize(null);
+        rbtnDelicate.setMinimumSize(new java.awt.Dimension(110, 23));
+        rbtnDelicate.setPreferredSize(new java.awt.Dimension(110, 23));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jRadioButton3, gridBagConstraints);
+        jPanel1.add(rbtnDelicate, gridBagConstraints);
 
-        buttonGroup1.add(jRadioButton4);
-        jRadioButton4.setText("Szybki");
-        jRadioButton4.setToolTipText("");
-        jRadioButton4.setMaximumSize(null);
-        jRadioButton4.setMinimumSize(new java.awt.Dimension(110, 23));
-        jRadioButton4.setPreferredSize(new java.awt.Dimension(110, 23));
+        rbtnFast.setText("Szybki");
+        rbtnFast.setToolTipText("");
+        rbtnFast.setMaximumSize(null);
+        rbtnFast.setMinimumSize(new java.awt.Dimension(110, 23));
+        rbtnFast.setPreferredSize(new java.awt.Dimension(110, 23));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jRadioButton4, gridBagConstraints);
+        jPanel1.add(rbtnFast, gridBagConstraints);
 
-        buttonGroup1.add(jRadioButton5);
-        jRadioButton5.setSelected(true);
-        jRadioButton5.setText("Pranie ręczne");
-        jRadioButton5.setMaximumSize(null);
-        jRadioButton5.setMinimumSize(new java.awt.Dimension(110, 23));
-        jRadioButton5.setPreferredSize(new java.awt.Dimension(110, 23));
+        rbtnHandWash.setText("Pranie ręczne");
+        rbtnHandWash.setMaximumSize(null);
+        rbtnHandWash.setMinimumSize(new java.awt.Dimension(110, 23));
+        rbtnHandWash.setPreferredSize(new java.awt.Dimension(110, 23));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jRadioButton5, gridBagConstraints);
+        jPanel1.add(rbtnHandWash, gridBagConstraints);
 
-        buttonGroup1.add(jRadioButton6);
-        jRadioButton6.setText("Własny program");
-        jRadioButton6.setMaximumSize(null);
-        jRadioButton6.setMinimumSize(new java.awt.Dimension(110, 23));
-        jRadioButton6.setPreferredSize(new java.awt.Dimension(110, 23));
+        rbtnCustom.setText("Własny program");
+        rbtnCustom.setMaximumSize(null);
+        rbtnCustom.setMinimumSize(new java.awt.Dimension(110, 23));
+        rbtnCustom.setPreferredSize(new java.awt.Dimension(110, 23));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jRadioButton6, gridBagConstraints);
+        jPanel1.add(rbtnCustom, gridBagConstraints);
 
-        jCheckBox2.setText("Dodatkowe pranie wstępne");
-        jCheckBox2.setMaximumSize(null);
-        jCheckBox2.setMinimumSize(new java.awt.Dimension(160, 23));
-        jCheckBox2.setPreferredSize(new java.awt.Dimension(160, 23));
+        chkAdditionalWash.setText("Dodatkowe pranie wstępne");
+        chkAdditionalWash.setMaximumSize(null);
+        chkAdditionalWash.setMinimumSize(new java.awt.Dimension(160, 23));
+        chkAdditionalWash.setPreferredSize(new java.awt.Dimension(160, 23));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jCheckBox2, gridBagConstraints);
+        jPanel1.add(chkAdditionalWash, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -224,24 +239,23 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         add(jPanel1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JCheckBox jCheckBox2;
+    private javax.swing.JButton btnPause;
+    private javax.swing.JButton btnSpeed;
+    private javax.swing.JButton btnStart;
+    private javax.swing.JButton btnTemperature;
+    private javax.swing.JButton btnWashingTime;
+    private javax.swing.JCheckBox chkAdditionalWash;
+    private javax.swing.JCheckBox chkCradle;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
-    private javax.swing.JRadioButton jRadioButton3;
-    private javax.swing.JRadioButton jRadioButton4;
-    private javax.swing.JRadioButton jRadioButton5;
-    private javax.swing.JRadioButton jRadioButton6;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
+    private javax.swing.JRadioButton rbtnCotton;
+    private javax.swing.JRadioButton rbtnCustom;
+    private javax.swing.JRadioButton rbtnDelicate;
+    private javax.swing.JRadioButton rbtnFast;
+    private javax.swing.JRadioButton rbtnHandWash;
+    private javax.swing.JRadioButton rbtnWool;
+    private javax.swing.JTextField txtSpeed;
+    private javax.swing.JTextField txtStatus;
+    private javax.swing.JTextField txtTemperature;
+    private javax.swing.JTextField txtWashingTime;
     // End of variables declaration//GEN-END:variables
 }

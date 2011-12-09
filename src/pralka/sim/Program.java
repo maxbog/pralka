@@ -30,7 +30,7 @@ public class Program {
         name = "Bawelna30";
     }
     
-    public Program(Integer temp, Integer washingSpeed, Integer rinsingSpeed, Integer spinningSpeed, Integer washingTime, Integer rinsingTime,Integer spinningTime,boolean initWashing,boolean woolCradle,String name) {
+    public Program(String name, Integer temp, Integer washingSpeed, Integer rinsingSpeed, Integer spinningSpeed, Integer washingTime, Integer rinsingTime, Integer spinningTime, boolean initWashing, boolean woolCradle) {
         this.initWashing = initWashing;
         this.name = name;
         this.rinsingSpeed = rinsingSpeed;
