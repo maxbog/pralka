@@ -32,9 +32,35 @@ public class WashingMachine extends Model {
     public Programmer getProgrammer() {
         return programmer;
     }
+
+    public Heater getHeater() {
+        return heater;
+    }
+
+    public Pump getPump() {
+        return pump;
+    }
+
+    public TemperatureSensor getTemperatureSensor() {
+        return temperatureSensor;
+    }
+
+    public WaterLevelSensor getWaterLevelSensor() {
+        return waterLevelSensor;
+    }
+
+    public Door getDoor() {
+        return door;
+    }
+
+    public Motor getMotor() {
+        return motor;
+    }
+    
+    
     
     public boolean hasBrokenComponent() {
-        return heater.broken() || pump.broken();
+        return heater.broken() || pump.broken() || motor.broken();
     }
     
     //<editor-fold defaultstate="collapsed" desc="Property - status">
