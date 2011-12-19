@@ -2,23 +2,31 @@ package pralka.ui;
 
 import com.jgoodies.binding.PresentationModel;
 import com.jgoodies.binding.adapter.Bindings;
+import com.jgoodies.binding.value.ConverterFactory;
+import java.text.Format;
+import java.text.NumberFormat;
+import pralka.sim.ComponentFactory;
+import pralka.sim.Environment;
 import pralka.sim.Programmer;
+import pralka.sim.Simulation;
+import pralka.sim.WashingMachine;
 
 public class UserInterfacePanel extends javax.swing.JPanel {
 
-    Programmer programmer;
+    WashingMachine washingMachine;
     
     /** Creates new form UserInterfacePanel */
     public UserInterfacePanel() {
         initComponents();
         
-        programmer = new Programmer();
+        washingMachine = new WashingMachine(new ComponentFactory(new Environment(), new Simulation()));
         
         initDataBindings();
     }
     
     private void initDataBindings() {
-        PresentationModel<Programmer> model = new PresentationModel<Programmer>(programmer);
+        PresentationModel<Programmer> model = new PresentationModel<Programmer>(washingMachine.getProgrammer());
+        PresentationModel<WashingMachine> washingMachineModel = new PresentationModel<WashingMachine>(washingMachine);
         
         // wybór programu
         Bindings.bind(rbtnCotton, model.getModel(Programmer.PROPERTYNAME_CHOSEN_PROGRAM), Programmer.PredefinedProgram.PROGRAM_COTTON);
@@ -27,6 +35,14 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         Bindings.bind(rbtnFast, model.getModel(Programmer.PROPERTYNAME_CHOSEN_PROGRAM), Programmer.PredefinedProgram.PROGRAM_FAST);
         Bindings.bind(rbtnHandWash, model.getModel(Programmer.PROPERTYNAME_CHOSEN_PROGRAM), Programmer.PredefinedProgram.PROGRAM_HANDWASH);
         Bindings.bind(rbtnCustom, model.getModel(Programmer.PROPERTYNAME_CHOSEN_PROGRAM), Programmer.PredefinedProgram.PROGRAM_CUSTOM);
+        
+        Bindings.bind(txtTemperature, ConverterFactory.createStringConverter(model.getModel(Programmer.PROPERTYNAME_TEMPERATURE), NumberFormat.getIntegerInstance()));
+        txtTemperature.setEditable(false);
+        
+        Bindings.bind(chkAdditionalWash, model.getModel(Programmer.PROPERTYNAME_ADDITIONAL_WASH));
+        
+        Bindings.bind(txtStatus, washingMachineModel.getModel(WashingMachine.PROPERTYNAME_STATUS));
+        txtStatus.setEditable(false);
     }
 
     /** This method is called from within the constructor to
@@ -85,6 +101,11 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         add(txtStatus, gridBagConstraints);
 
         btnTemperature.setText("Temperatura");
+        btnTemperature.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnTemperatureActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -238,6 +259,11 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         gridBagConstraints.weighty = 1.0;
         add(jPanel1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnTemperatureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTemperatureActionPerformed
+        washingMachine.getProgrammer().changeTemperature();
+    }//GEN-LAST:event_btnTemperatureActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnPause;
     private javax.swing.JButton btnSpeed;

@@ -1,16 +1,17 @@
 package pralka.sim;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class Simulation {
     Environment environment;
     WashingMachine washingMachine;
     Timer timer;
     
-    List<SimulationThread> threads;
+    ArrayList<SimulationThread> threads;
 
     public Simulation() {
         timer = new Timer();
+        threads = new ArrayList<SimulationThread>();
         environment = registeringThread(new Environment());
         washingMachine = new WashingMachine(new ComponentFactory(environment, this));
     }

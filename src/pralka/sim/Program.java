@@ -6,7 +6,7 @@ package pralka.sim;
 
 public class Program {
     
-    private Integer temperature;
+    private int temperature;
     private Integer washingSpeed;
     private Integer rinsingSpeed;
     private Integer spinningSpeed;
@@ -30,7 +30,7 @@ public class Program {
         name = "Bawelna30";
     }
     
-    public Program(String name, Integer temp, Integer washingSpeed, Integer rinsingSpeed, Integer spinningSpeed, Integer washingTime, Integer rinsingTime, Integer spinningTime, boolean initWashing, boolean woolCradle) {
+    public Program(String name, int temp, Integer washingSpeed, Integer rinsingSpeed, Integer spinningSpeed, Integer washingTime, Integer rinsingTime, Integer spinningTime, boolean initWashing, boolean woolCradle) {
         this.initWashing = initWashing;
         this.name = name;
         this.rinsingSpeed = rinsingSpeed;
@@ -43,8 +43,12 @@ public class Program {
         this.woolCradle = woolCradle;
      }
     
-    public Integer getTemperature() {
+    public int getTemperature() {
         return temperature;
+    }
+
+    public void setTemperature(int temperature) {
+        this.temperature = temperature;
     }
     
    public Integer getWashingSpeed() {

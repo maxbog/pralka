@@ -1,8 +1,10 @@
 
 package pralka.sim;
 
+import com.jgoodies.binding.beans.Model;
 
-public class WashingMachine {
+
+public class WashingMachine extends Model {
     Door door;
     Motor motor;
     Heater heater;
@@ -10,6 +12,7 @@ public class WashingMachine {
     ControlUnit controlUnit;
     TemperatureSensor temperatureSensor;
     WaterLevelSensor waterLevelSensor;
+    Programmer programmer;
     
     public WashingMachine(ComponentFactory factory) {
         door = factory.createDoor();
@@ -19,5 +22,37 @@ public class WashingMachine {
         temperatureSensor = factory.createTemperatureSensor();
         waterLevelSensor = factory.createWaterLevelSensor();        
         controlUnit = factory.createControlUnit(this);
+        programmer = factory.createProgrammer(this);
     }
+
+    public ControlUnit getControlUnit() {
+        return controlUnit;
+    }
+
+    public Programmer getProgrammer() {
+        return programmer;
+    }
+    
+    public boolean hasBrokenComponent() {
+        return heater.broken() || pump.broken();
+    }
+    
+    //<editor-fold defaultstate="collapsed" desc="Property - status">
+    public static final String PROPERTYNAME_STATUS = "status";
+    private String status;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        if(status == null ? this.status == null : status.equals(this.status))
+            return;
+        String oldValue = this.status;
+        this.status = status;
+        firePropertyChange(PROPERTYNAME_STATUS, oldValue, status);        
+    }
+    //</editor-fold>
+    
+    
 }
