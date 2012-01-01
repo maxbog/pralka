@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import pralka.msg.GetMeasurementMessage;
 import pralka.msg.WorkingStateMessage;
 import pralka.msg.Message;
+import pralka.msg.PumpControllerMessage;
 import pralka.msg.PumpingFinishedMessage;
 import pralka.msg.TemperatureMessage;
 import pralka.msg.WaterLevelMessage;
@@ -21,17 +22,20 @@ public class ControlUnit extends SimulationThread {
 
     private double countingStartTime;
     
+    private PumpController pumpController;
+    
     private void processWorkingState(Message msg) throws InterruptedException {
         if(workingStates.containsAll(Arrays.asList(WorkingState.HEATING, WorkingState.WASHING)) 
                 && heatingState == HeatingState.FINISHED 
                 && washingState == WashingState.FINISHED) {
             workingStates.clear();
             workingStates.add(WorkingState.PUMPING_OUTSIDE);
-            
+            pumpController.getMessageQueue().put(new PumpControllerMessage(Pump.Direction.OUTSIDE, WorkingStateMessage.Activity.START));
         }
         
         if(workingStates.contains(WorkingState.PUMPING_OUTSIDE) && msg instanceof PumpingFinishedMessage) {
             workingStates.clear();
+            pumpController.getMessageQueue().put(new PumpControllerMessage(null, WorkingStateMessage.Activity.STOP));
             if(currentStage != WashingStage.RINSING) {
                 currentStage = currentStage == WashingStage.FIRST_WASHING ? WashingStage.SECOND_WASHING : WashingStage.RINSING;
                 workingStates.add(WorkingState.INIT_WASHING);

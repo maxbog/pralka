@@ -29,55 +29,20 @@ public class Pump extends SimulationThread {
         this.state = State.STOPPED;
     }
 
-    public synchronized void startPumping(Direction direction) {
-        switch (state) {
-            case STOPPED:
-                if (direction == Direction.INSIDE) {
-                    state = State.PUMPING_INSIDE;
-                } else {
-                    state = State.PUMPING_OUTSIDE;
-                }
-                break;
-        }
-    }
-
-    public synchronized void stopPumping() {
-        switch (state) {
-            case PUMPING_INSIDE:
-                state = State.STOPPED;
-                break;
-            case PUMPING_OUTSIDE:
-                state = State.STOPPED;
-                break;
-        }
-    }
-
-    @Override
-    public void run() {
-        while (simulationRunning()) {
-            synchronized (this) {
-                switch (state) {
-                    case PUMPING_INSIDE:
-                        environment.increaseWaterLevel(litersPerSecond * getTimeDelta());
-                    case PUMPING_OUTSIDE:
-                        environment.decreaseWaterLevel(litersPerSecond * getTimeDelta());
-                }
-            }
-        }
-    }
-
     @Override
     protected void simulationStep() {
         try {
-            Message msg = messageQueue.poll(0, TimeUnit.NANOSECONDS);
+            Message msg = messageQueue.poll(100, TimeUnit.MILLISECONDS);
             if (msg instanceof PumpControlMessage) {
                 handlePumpControlMessage((PumpControlMessage)msg);
             } else {
                 switch (state) {
                     case PUMPING_INSIDE:
                         environment.increaseWaterLevel(litersPerSecond * getTimeDelta());
+                        break;
                     case PUMPING_OUTSIDE:
                         environment.decreaseWaterLevel(litersPerSecond * getTimeDelta());
+                        break;
                 }
             }
         } catch (InterruptedException ex) {

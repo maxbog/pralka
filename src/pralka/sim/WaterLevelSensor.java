@@ -8,8 +8,8 @@ import pralka.msg.WaterLevelMessage;
 
 public class WaterLevelSensor extends SimulationThread {
 
-    private static final int LOW_LEVEL = 90;
-    private static final int HIGH_LEVEL = 100;
+    private static final int LOW_LEVEL = 0;
+    private static final int HIGH_LEVEL = 10;
     private Environment environment;
 
     public WaterLevelSensor(Environment environment) {

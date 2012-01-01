@@ -1,11 +1,21 @@
 package pralka.sim;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import pralka.msg.Message;
+import pralka.msg.PumpControllerMessage;
+import pralka.msg.TemperatureControllerMessage;
+import pralka.msg.WorkingStateMessage.Activity;
 
 public class Simulation {
     Environment environment;
     WashingMachine washingMachine;
     Timer timer;
+    WaterLevelSensor sensor;
+    Pump pump;
+    ControlUnit controlUnit;
+    PumpController pumpCtrl;
     
     ArrayList<SimulationThread> threads;
 
@@ -13,7 +23,20 @@ public class Simulation {
         timer = new Timer();
         threads = new ArrayList<SimulationThread>();
         environment = registeringThread(new Environment());
-        washingMachine = new WashingMachine(new ComponentFactory(environment, this));
+        sensor = registeringThread(new WaterLevelSensor(environment));
+        pump = registeringThread(new Pump(environment));
+        washingMachine = new WashingMachine(new ComponentFactory(new Environment(), this));
+        controlUnit = new ControlUnit(washingMachine);
+        pumpCtrl = registeringThread(new PumpController(controlUnit, sensor, pump));
+        timer.resumeTimer();
+        timer.start();
+        try {
+            pumpCtrl.getMessageQueue().put(new PumpControllerMessage(Pump.Direction.INSIDE, Activity.START));
+            //washingMachine = new WashingMachine(new ComponentFactory(environment, this));
+            
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
+        }        
     }
     
     public final <T extends SimulationThread> T registeringThread(T thread) {
@@ -21,6 +44,12 @@ public class Simulation {
         threads.add(thread);
         return thread;
     }
+
+    public Environment getEnvironment() {
+        return environment;
+    }
+    
+    
 
     public void waitWhilePaused() {
         timer.waitWhilePaused();
@@ -34,14 +63,14 @@ public class Simulation {
         for(SimulationThread thread : threads) {
             thread.start();
         }
-        timer.resume();
+        timer.resumeTimer();
     }
         
     public void stop() {
         for(SimulationThread thread : threads) {
             thread.stopThread();
         }
-        timer.resume();
+        timer.resumeTimer();
     }
     
     public void pause() {
@@ -49,6 +78,10 @@ public class Simulation {
     }
     
     public void resume() {
-        timer.resume();
+        timer.resumeTimer();
+    }
+    
+    public void scheduleMessage(Message msg, SimulationThread destination, double time) {
+        timer.scheduleMessage(msg, destination, time);
     }
 }

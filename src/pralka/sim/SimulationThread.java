@@ -27,7 +27,7 @@ public class SimulationThread extends Thread {
         if(shouldStop)
             return false;
         final double currentTime = simulation.getCurrentTime();
-        timeDelta = (currentTime - simulationTime) / 1000;
+        timeDelta = currentTime - simulationTime;
         simulationTime = currentTime;
         return true;
     }
@@ -55,7 +55,7 @@ public class SimulationThread extends Thread {
         
     }
     
-    protected void scheduleMessage(Message msg, SimulationThread destination, int millis) {
-        
+    protected void scheduleMessage(Message msg, SimulationThread destination, double time) {
+        simulation.scheduleMessage(msg, destination, time);
     }
 }

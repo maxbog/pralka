@@ -52,10 +52,10 @@ public class Environment extends SimulationThread {
     }
     //</editor-fold>
     //<editor-fold defaultstate="collapsed" desc="Temperatura wody">
-    private double waterTemperature;
+    private double waterTemperature = 20.;
     private ReadWriteLock waterTemperatureLock = new ReentrantReadWriteLock();
     private double heatingPower;
-    private static final double TIME_CONSTANT = 1.;
+    private static final double TIME_CONSTANT = 1;
     // temperatura pokojowa
     private static final double COOLING_POWER = 20;
 

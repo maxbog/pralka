@@ -12,9 +12,9 @@ public class Heater extends SimulationThread {
         STOPPED,
         HEATING
     }
-    private static final double HEATING_POWER = 100.;
+    private static final double HEATING_POWER = 10000.;
     private Environment environment;
-    private State state;
+    private State state = State.STOPPED;
 
     public Heater(Environment environment) {
         this.environment = environment;
@@ -39,11 +39,13 @@ public class Heater extends SimulationThread {
                     environment.setHeatingPower(HEATING_POWER);
                     state = State.HEATING;
                 }
+                break;
             case STOP:
                 if (state == State.HEATING) {
                     environment.setHeatingPower(0);
                     state = State.STOPPED;
                 }
+                break;
         }
     }
 }

@@ -22,11 +22,18 @@ public class TemperatureController extends SimulationThread {
         ON,
         OFF
     }
-    private HeatingState heatingState;
+    private HeatingState heatingState = HeatingState.HEATER_OFF;
     private State state;
     private TemperatureSensor temperatureSensor;
     private Heater heater;
     private double setTemperature;
+
+    public TemperatureController(TemperatureSensor temperatureSensor, Heater heater) {
+        this.temperatureSensor = temperatureSensor;
+        this.heater = heater;
+    }
+    
+    
 
     @Override
     protected void simulationStep() {
@@ -36,6 +43,7 @@ public class TemperatureController extends SimulationThread {
                 switch (((TemperatureControllerMessage) msg).getActivity()) {
                     case START:
                         setTemperature = ((TemperatureControllerMessage) msg).getTargetTemperature();
+                        scheduleMessage(new GetMeasurementMessage(this), temperatureSensor, 1);
                         state = State.ON;
                         break;
                     case STOP:
@@ -52,13 +60,15 @@ public class TemperatureController extends SimulationThread {
                             heatingState = HeatingState.HEATER_OFF;
                             heater.getMessageQueue().put(new WorkingStateMessage(WorkingStateMessage.Activity.STOP));
                         }
+                        break;
                     case HEATER_OFF:
                         if (setTemperature - EPSILON > currentTemp) {
                             heatingState = HeatingState.HEATER_ON;
                             heater.getMessageQueue().put(new WorkingStateMessage(WorkingStateMessage.Activity.START));
                         }
+                        break;
                 }
-                scheduleMessage(new GetMeasurementMessage(this), temperatureSensor, 1000);
+                scheduleMessage(new GetMeasurementMessage(this), temperatureSensor, 1);
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(TemperatureController.class.getName()).log(Level.SEVERE, null, ex);
