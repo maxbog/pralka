@@ -1,6 +1,11 @@
 package pralka.sim;
 
-public class Heater extends BreakableComponent {
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import pralka.msg.WorkingStateMessage;
+import pralka.msg.Message;
+
+public class Heater extends SimulationThread {
 
     private static enum State {
 
@@ -12,42 +17,33 @@ public class Heater extends BreakableComponent {
     private State state;
 
     public Heater(Environment environment) {
-        super(10);
         this.environment = environment;
-    }
-
-    public synchronized void startHeating() {
-        if (broken()) {
-            return;
-        }
-        if (state == State.STOPPED) {
-            environment.setHeatingPower(HEATING_POWER);
-            state = State.HEATING;
-        }
-    }
-
-    public synchronized void stopHeating() {
-        if (broken()) {
-            return;
-        }
-        if (state == State.HEATING) {
-            environment.setHeatingPower(0);
-            state = State.STOPPED;
-        }
     }
 
     @Override
     protected synchronized void simulationStep() {
-        if (working() && state == State.HEATING && environment.waterLevelTooLow()) {
-            startBreakingTimer();
-        }
-        if (breaking() && !environment.waterLevelTooLow()) {
-            stopBreakingTimer();
+        try {
+            Message msg = messageQueue.take();
+            if (msg instanceof WorkingStateMessage) {
+                handleHeaterControlMessage((WorkingStateMessage)msg);
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Heater.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    @Override
-    protected synchronized void componentBrokeDown() {
-        environment.setHeatingPower(0);
+
+    private void handleHeaterControlMessage(WorkingStateMessage msg) {
+        switch (msg.getActivity()) {
+            case START:
+                if (state == State.STOPPED) {
+                    environment.setHeatingPower(HEATING_POWER);
+                    state = State.HEATING;
+                }
+            case STOP:
+                if (state == State.HEATING) {
+                    environment.setHeatingPower(0);
+                    state = State.STOPPED;
+                }
+        }
     }
 }

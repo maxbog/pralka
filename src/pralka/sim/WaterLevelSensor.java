@@ -1,6 +1,12 @@
 package pralka.sim;
 
-public class WaterLevelSensor {
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import pralka.msg.GetMeasurementMessage;
+import pralka.msg.Message;
+import pralka.msg.WaterLevelMessage;
+
+public class WaterLevelSensor extends SimulationThread {
 
     private static final int LOW_LEVEL = 90;
     private static final int HIGH_LEVEL = 100;
@@ -10,11 +16,15 @@ public class WaterLevelSensor {
         this.environment = environment;
     }
 
-    public boolean aboveLowLevel() {
-        return environment.getWaterLevel() >= LOW_LEVEL;
-    }
-
-    public boolean aboveHighLevel() {
-        return environment.getWaterLevel() >= HIGH_LEVEL;
+    @Override
+    protected void simulationStep() {
+        try {
+            Message msg = messageQueue.take();
+            if(msg instanceof GetMeasurementMessage) {
+                ((GetMeasurementMessage)msg).getReturnThread().getMessageQueue().put(new WaterLevelMessage(environment.getWaterLevel() >= HIGH_LEVEL, environment.getWaterLevel() >= LOW_LEVEL));
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(TemperatureSensor.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

@@ -6,6 +6,14 @@ package pralka.sim;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import pralka.msg.GetMeasurementMessage;
+import pralka.msg.WorkingStateMessage;
+import pralka.msg.Message;
+import pralka.msg.PumpingFinishedMessage;
+import pralka.msg.TemperatureMessage;
+import pralka.msg.WaterLevelMessage;
 
 public class ControlUnit extends SimulationThread {
     private final double EPSILON = 2.;
@@ -13,15 +21,16 @@ public class ControlUnit extends SimulationThread {
 
     private double countingStartTime;
     
-    private void processWorkingState() {
+    private void processWorkingState(Message msg) throws InterruptedException {
         if(workingStates.containsAll(Arrays.asList(WorkingState.HEATING, WorkingState.WASHING)) 
                 && heatingState == HeatingState.FINISHED 
                 && washingState == WashingState.FINISHED) {
             workingStates.clear();
             workingStates.add(WorkingState.PUMPING_OUTSIDE);
+            
         }
         
-        if(workingStates.contains(WorkingState.PUMPING_OUTSIDE) && pumpingState == PumpingState.NOT_PUMPING) {
+        if(workingStates.contains(WorkingState.PUMPING_OUTSIDE) && msg instanceof PumpingFinishedMessage) {
             workingStates.clear();
             if(currentStage != WashingStage.RINSING) {
                 currentStage = currentStage == WashingStage.FIRST_WASHING ? WashingStage.SECOND_WASHING : WashingStage.RINSING;
@@ -39,35 +48,8 @@ public class ControlUnit extends SimulationThread {
             workingStates.add(WorkingState.WAITING_AFTER_WASHING);
         }
         
-        if(workingStates.contains(WorkingState.HEATING)) {
-            switch(heatingState) {
-                case HEATING:
-                    if(currentProgram.getTemperature() + EPSILON < washingMachine.getTemperatureSensor().getTemperature()) {
-                        heatingState = HeatingState.NOT_HEATING;
-                        washingMachine.getHeater().stopHeating();
-                    }
-                case NOT_HEATING:
-                    if(currentProgram.getTemperature() - EPSILON > washingMachine.getTemperatureSensor().getTemperature()) {
-                        heatingState = HeatingState.HEATING;
-                        washingMachine.getHeater().startHeating();
-                    }
-            }
-        }
-        
-        if(workingStates.contains(WorkingState.PUMPING_INSIDE) && pumpingState == PumpingState.PUMPING) {
-            if(washingMachine.getWaterLevelSensor().aboveHighLevel()) {
-                pumpingState = PumpingState.NOT_PUMPING;
-            }
-        }
-        
         if(workingStates.contains(WorkingState.WASHING)) {
             
-        }
-        
-        if(workingStates.contains(WorkingState.PUMPING_OUTSIDE) && pumpingState == PumpingState.PUMPING) {
-            if(!washingMachine.getWaterLevelSensor().aboveLowLevel()) {
-                pumpingState = PumpingState.NOT_PUMPING;
-            }
         }
         
         if(workingStates.contains(WorkingState.SPINNING)) {
@@ -121,15 +103,6 @@ public class ControlUnit extends SimulationThread {
         SPINNING,
         NOT_SPINNING
     }
-
-    private boolean ensureNotBroken() {
-        if (washingMachine.hasBrokenComponent()) {
-            state = State.BROKEN;
-            washingMachine.setStatus("Zepsuta");
-            return false;
-        }
-        return true;
-    }
     
     public enum WashingStage {
         FIRST_WASHING,
@@ -170,19 +143,26 @@ public class ControlUnit extends SimulationThread {
 
     @Override
     public void simulationStep() {
-
-        switch(state) {
-            case STOPPED:
-                if(!ensureNotBroken())
-                    break;
-            case WORKING:
-                if(!ensureNotBroken())
-                    break;
-                processWorkingState();
-            case PAUSED:
-                if(!ensureNotBroken())
-                    break;
-            case BROKEN:
+        try {
+            Message msg = messageQueue.take();
+            scheduleMeasurements(msg);
+            switch(state) {
+                case STOPPED:
+                case WORKING:
+                    processWorkingState(msg);
+                case PAUSED:
+                case BROKEN:
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ControlUnit.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void scheduleMeasurements(Message msg) {
+        if(msg instanceof TemperatureMessage) {
+            scheduleMessage(new GetMeasurementMessage(this),washingMachine.getTemperatureSensor(), 1000);
+        } else if(msg instanceof WaterLevelMessage) {
+            scheduleMessage(new GetMeasurementMessage(this),washingMachine.getWaterLevelSensor(), 1000);
         }
     }
 }

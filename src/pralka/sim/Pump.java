@@ -1,6 +1,12 @@
 package pralka.sim;
 
-public class Pump extends BreakableComponent {
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import pralka.msg.Message;
+import pralka.msg.PumpControlMessage;
+
+public class Pump extends SimulationThread {
 
     private static enum State {
 
@@ -19,14 +25,11 @@ public class Pump extends BreakableComponent {
     private static final double litersPerSecond = 1.;
 
     public Pump(Environment environment) {
-        super(10);
         this.environment = environment;
         this.state = State.STOPPED;
     }
 
     public synchronized void startPumping(Direction direction) {
-        if(broken())
-            return;
         switch (state) {
             case STOPPED:
                 if (direction == Direction.INSIDE) {
@@ -35,18 +38,10 @@ public class Pump extends BreakableComponent {
                     state = State.PUMPING_OUTSIDE;
                 }
                 break;
-            case PUMPING_INSIDE:
-                breakInstantly();
-                break;
-            case PUMPING_OUTSIDE:
-                breakInstantly();
-                break;
         }
     }
 
     public synchronized void stopPumping() {
-        if(broken())
-            return;
         switch (state) {
             case PUMPING_INSIDE:
                 state = State.STOPPED;
@@ -63,18 +58,51 @@ public class Pump extends BreakableComponent {
             synchronized (this) {
                 switch (state) {
                     case PUMPING_INSIDE:
-                        if (environment.waterLevelTooLow()) {
-                            startBreakingTimer();
-                        } else {
-                            environment.increaseWaterLevel(litersPerSecond * getTimeDelta());
-                        }
+                        environment.increaseWaterLevel(litersPerSecond * getTimeDelta());
                     case PUMPING_OUTSIDE:
-                        if (environment.waterLevelTooLow()) {
-                            startBreakingTimer();
-                        } else {
-                            environment.decreaseWaterLevel(litersPerSecond * getTimeDelta());
-                        }
+                        environment.decreaseWaterLevel(litersPerSecond * getTimeDelta());
                 }
+            }
+        }
+    }
+
+    @Override
+    protected void simulationStep() {
+        try {
+            Message msg = messageQueue.poll(0, TimeUnit.NANOSECONDS);
+            if (msg instanceof PumpControlMessage) {
+                handlePumpControlMessage((PumpControlMessage)msg);
+            } else {
+                switch (state) {
+                    case PUMPING_INSIDE:
+                        environment.increaseWaterLevel(litersPerSecond * getTimeDelta());
+                    case PUMPING_OUTSIDE:
+                        environment.decreaseWaterLevel(litersPerSecond * getTimeDelta());
+                }
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Pump.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void handlePumpControlMessage(PumpControlMessage msg) {
+        if (msg.getActivity() == PumpControlMessage.Activity.STOP) {
+            switch (state) {
+                case PUMPING_INSIDE:
+                    state = State.STOPPED;
+                    break;
+                case PUMPING_OUTSIDE:
+                    state = State.STOPPED;
+                    break;
+            }
+        } else if (msg.getActivity() == PumpControlMessage.Activity.START && state == State.STOPPED) {
+            switch (msg.getDirection()) {
+                case INSIDE:
+                    state = State.PUMPING_INSIDE;
+                    break;
+                case OUTSIDE:
+                    state = State.PUMPING_OUTSIDE;
+                    break;
             }
         }
     }

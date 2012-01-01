@@ -57,12 +57,6 @@ public class WashingMachine extends Model {
         return motor;
     }
     
-    
-    
-    public boolean hasBrokenComponent() {
-        return heater.broken() || pump.broken() || motor.broken();
-    }
-    
     //<editor-fold defaultstate="collapsed" desc="Property - status">
     public static final String PROPERTYNAME_STATUS = "status";
     private String status;

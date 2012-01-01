@@ -26,11 +26,11 @@ public class ComponentFactory {
     }
     
     public TemperatureSensor createTemperatureSensor() {
-        return new TemperatureSensor(environment);
+        return simulation.registeringThread(new TemperatureSensor(environment));
     }
     
     public WaterLevelSensor createWaterLevelSensor() {
-        return new WaterLevelSensor(environment);
+        return simulation.registeringThread(new WaterLevelSensor(environment));
     }
     
     public ControlUnit createControlUnit(WashingMachine washingMachine) {
