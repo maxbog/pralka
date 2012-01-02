@@ -1,8 +1,25 @@
 package pralka.sim;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import pralka.msg.Message;
+import pralka.msg.MotorControlMessage;
+
 public class Motor extends SimulationThread {
 
-    public Motor() {
+    private void handleMotorControlMessage(MotorControlMessage msg) {
+        switch(msg.getActivity()) {
+            case START:
+                if(state == State.SPINNING) {
+                    break;
+                }
+                direction = msg.getDirection();
+                state = Motor.State.SPINNING;
+                break;
+            case STOP:
+                state = State.STOPPED;
+                break;                
+        }
     }
     
     public static enum Direction {
@@ -18,17 +35,19 @@ public class Motor extends SimulationThread {
     private int speed;
     private Direction direction;
     private State state;
-    
-    public void stopSpinning() {
-        if(state == State.STOPPED)
-            return;
-        state = State.STOPPED;
+
+    @Override
+    protected void simulationStep() {
+        try {
+            Message msg = messageQueue.take();
+            if(msg instanceof MotorControlMessage) {
+                handleMotorControlMessage((MotorControlMessage)msg);
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(PumpController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
-    public void startSpinning(int speed, Direction direction) {
-        this.speed = speed;
-        this.direction = direction;
-        state = State.SPINNING;
-    }
+    
     
 }

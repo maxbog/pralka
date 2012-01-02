@@ -9,11 +9,15 @@ import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import pralka.msg.GetMeasurementMessage;
+import pralka.msg.InitFinishedMessage;
 import pralka.msg.WorkingStateMessage;
 import pralka.msg.Message;
 import pralka.msg.PumpControllerMessage;
 import pralka.msg.PumpingFinishedMessage;
+import pralka.msg.TemperatureControllerMessage;
 import pralka.msg.TemperatureMessage;
+import pralka.msg.WaitingFinishedMessage;
+import pralka.msg.WashingFinishedMessage;
 import pralka.msg.WaterLevelMessage;
 
 public class ControlUnit extends SimulationThread {
@@ -23,13 +27,31 @@ public class ControlUnit extends SimulationThread {
     private double countingStartTime;
     
     private PumpController pumpController;
+    private TemperatureController tempController;
+    private WashingController washingController;
     
     private void processWorkingState(Message msg) throws InterruptedException {
-        if(workingStates.containsAll(Arrays.asList(WorkingState.HEATING, WorkingState.WASHING)) 
-                && heatingState == HeatingState.FINISHED 
-                && washingState == WashingState.FINISHED) {
+        
+        if(workingStates.contains(WorkingState.INIT_WASHING) && msg instanceof InitFinishedMessage) {
+            workingStates.clear();
+            workingStates.addAll(Arrays.asList(WorkingState.HEATING, WorkingState.WASHING));
+            tempController.getMessageQueue().put(new TemperatureControllerMessage(currentProgram.getTemperature(), WorkingStateMessage.Activity.START));
+            pumpController.getMessageQueue().put(new PumpControllerMessage(Pump.Direction.INSIDE, WorkingStateMessage.Activity.START));
+        }
+        
+        if(workingStates.contains(WorkingState.PUMPING_INSIDE) && msg instanceof PumpingFinishedMessage) {
+            workingStates.remove(WorkingState.PUMPING_INSIDE);
+            workingStates.add(WorkingState.WASHING);
+            washingController.getMessageQueue().put(new WorkingStateMessage(WorkingStateMessage.Activity.START));
+            double washingTime = currentStage == WashingStage.WASHING ? currentProgram.getWashingTime() : currentProgram.getRinsingTime();
+            scheduleMessage(new WashingFinishedMessage(), this, washingTime);
+        }
+        
+        if(workingStates.containsAll(Arrays.asList(WorkingState.HEATING, WorkingState.WASHING)) && msg instanceof WashingFinishedMessage) {
             workingStates.clear();
             workingStates.add(WorkingState.PUMPING_OUTSIDE);
+            tempController.getMessageQueue().put(new TemperatureControllerMessage(0., WorkingStateMessage.Activity.STOP));
+            washingController.getMessageQueue().put(new WorkingStateMessage(WorkingStateMessage.Activity.STOP));
             pumpController.getMessageQueue().put(new PumpControllerMessage(Pump.Direction.OUTSIDE, WorkingStateMessage.Activity.START));
         }
         
@@ -37,33 +59,24 @@ public class ControlUnit extends SimulationThread {
             workingStates.clear();
             pumpController.getMessageQueue().put(new PumpControllerMessage(null, WorkingStateMessage.Activity.STOP));
             if(currentStage != WashingStage.RINSING) {
-                currentStage = currentStage == WashingStage.FIRST_WASHING ? WashingStage.SECOND_WASHING : WashingStage.RINSING;
+                currentStage = WashingStage.RINSING;
                 workingStates.add(WorkingState.INIT_WASHING);
+                scheduleMessage(new InitFinishedMessage(), this, 10);
             } else {
-                countingStartTime = getSimulationTime();
-                washingMachine.getMotor().startSpinning(currentProgram.getSpinningSpeed(), Motor.Direction.LEFT);
+                washingController.getMessageQueue().put(new WorkingStateMessage(WorkingStateMessage.Activity.START));
+                scheduleMessage(new WashingFinishedMessage(), this, currentProgram.getSpinningTime());
                 workingStates.add(WorkingState.SPINNING);
             }
         }
         
-        if(workingStates.contains(WorkingState.SPINNING) && spinningState == SpinningState.NOT_SPINNING) {
+        if(workingStates.contains(WorkingState.SPINNING)  && msg instanceof WashingFinishedMessage) {
             workingStates.clear();
-            countingStartTime = getSimulationTime();            
             workingStates.add(WorkingState.WAITING_AFTER_WASHING);
+            scheduleMessage(new WaitingFinishedMessage(), this, WAITING_AFTER_WASHING_TIME);
         }
         
-        if(workingStates.contains(WorkingState.WASHING)) {
-            
-        }
-        
-        if(workingStates.contains(WorkingState.SPINNING)) {
-            if(spinningState == SpinningState.SPINNING && getSimulationTime() >= countingStartTime + currentProgram.getSpinningTime()) {
-                washingMachine.getMotor().stopSpinning();
-                spinningState = SpinningState.NOT_SPINNING;
-            }
-        }       
-        
-        if(workingStates.contains(WorkingState.WAITING_AFTER_WASHING) && getSimulationTime() >= countingStartTime + WAITING_AFTER_WASHING_TIME) {
+        if(workingStates.contains(WorkingState.WAITING_AFTER_WASHING) && msg instanceof WaitingFinishedMessage) {
+            workingStates.clear();
             washingMachine.getDoor().unlock();
             state = State.STOPPED;
         }
@@ -86,31 +99,8 @@ public class ControlUnit extends SimulationThread {
         WAITING_AFTER_WASHING
     }
     
-    private static enum PumpingState {
-        PUMPING,
-        NOT_PUMPING
-    }
-    
-    private static enum HeatingState {
-        HEATING,
-        NOT_HEATING,
-        FINISHED
-    }
-    
-    private static enum WashingState {
-        WASH_LEFT,
-        WASH_RIGHT,
-        FINISHED
-    }
-    
-    private static enum SpinningState {
-        SPINNING,
-        NOT_SPINNING
-    }
-    
     public enum WashingStage {
-        FIRST_WASHING,
-        SECOND_WASHING,
+        WASHING,
         RINSING
     }
     private Program currentProgram;
@@ -120,10 +110,6 @@ public class ControlUnit extends SimulationThread {
     
     private EnumSet workingStates = EnumSet.noneOf(WorkingState.class);
     private State state;
-    private HeatingState heatingState;
-    private PumpingState pumpingState;
-    private WashingState washingState;
-    private SpinningState spinningState;
 
     public ControlUnit(WashingMachine washingMachine) {
         this.washingMachine = washingMachine;

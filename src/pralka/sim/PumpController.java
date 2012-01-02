@@ -13,7 +13,6 @@ import pralka.msg.WorkingStateMessage.Activity;
 public class PumpController extends SimulationThread {
 
     private static enum State {
-
         PUMPING_INSIDE,
         PUMPING_OUTSIDE,
         NOT_PUMPING
