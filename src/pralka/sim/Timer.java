@@ -1,9 +1,8 @@
 package pralka.sim;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.PriorityQueue;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -12,6 +11,16 @@ import java.util.logging.Logger;
 import pralka.msg.Message;
 
 public class Timer extends Thread {
+
+    synchronized void clearScheduledMessages(SimulationThread destination) {
+        ArrayList<ScheduledMessage> toRemove = new ArrayList<ScheduledMessage>();
+        for(ScheduledMessage msg : scheduledMessages) {
+            if(msg.getDestination() == destination) {
+                toRemove.add(msg);
+            }
+        }
+        scheduledMessages.removeAll(toRemove);
+    }
 
     public static class ScheduledMessage {
 

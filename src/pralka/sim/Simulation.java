@@ -84,4 +84,8 @@ public class Simulation {
     public void scheduleMessage(Message msg, SimulationThread destination, double time) {
         timer.scheduleMessage(msg, destination, time);
     }
+
+    void clearScheduledMessages(SimulationThread destination) {
+        timer.clearScheduledMessages(destination);
+    }
 }

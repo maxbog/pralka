@@ -48,6 +48,7 @@ public class TemperatureController extends SimulationThread {
                         state = State.ON;
                         break;
                     case STOP:
+                        clearScheduledMessages();
                         state = State.OFF;
                         break;
                 }

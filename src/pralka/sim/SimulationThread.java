@@ -64,4 +64,8 @@ public class SimulationThread extends Thread {
     protected void scheduleMessage(Message msg, double time) {
         simulation.scheduleMessage(msg, this, time);
     }
+    
+    protected void clearScheduledMessages() {
+        simulation.clearScheduledMessages(this);
+    }
 }

@@ -32,6 +32,7 @@ public class WashingController extends SimulationThread {
                         scheduleMessage(new ChangeWashingDirectionMessage(), ONE_DIRECTION_TIME);
                         break;
                     case STOP:
+                        clearScheduledMessages();
                         state = State.NOT_WASHING;
                         break;
                 }

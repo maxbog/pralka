@@ -48,6 +48,7 @@ public class PumpController extends SimulationThread {
                         waterLevelSensor.scheduleMessage(new GetMeasurementMessage(this), MEASUREMENT_PERIOD);
                         break;
                     case STOP:
+                        clearScheduledMessages();
                         state = State.NOT_PUMPING;
                         pump.send(new PumpControlMessage(Activity.STOP, null));
                         break;

@@ -22,23 +22,29 @@ import pralka.msg.WashingFinishedMessage;
 import pralka.msg.WaterLevelMessage;
 
 public class ControlUnit extends SimulationThread {
+    private static final int INIT_TIME = 10;
     private final double WAITING_AFTER_WASHING_TIME = 5*60.;
     
     private PumpController pumpController;
     private TemperatureController tempController;
     private WashingController washingController;
-    private double washingRemainingTime;
-    private double washingStartedTime;
+    private double operationRemainingTime;
+    private double operationElapsedTime;
+    private double operationStartedTime;
     
     private void processWorkingState(Message msg) throws InterruptedException {
         if(msg instanceof ControlUnitMessage) {
             ControlUnitMessage cuMessage = (ControlUnitMessage) msg;
             if(cuMessage.getActivity() == ControlUnitMessage.Activity.STOP) {
-                workingStates.clear();
+                stopWashing();
+            }
+            if(cuMessage.getActivity() == ControlUnitMessage.Activity.PAUSE) {
+                clearScheduledMessages();
+                computeRemainingOperationTime();
                 washingController.send(new WorkingStateMessage(WorkingStateMessage.Activity.STOP));
                 tempController.send(new TemperatureControllerMessage(0, WorkingStateMessage.Activity.STOP));
-                washingMachine.getWaterLevelSensor().send(new GetMeasurementMessage(this));
-                state = State.STOPPING;
+                pumpController.send(new PumpControllerMessage(null, WorkingStateMessage.Activity.STOP));
+                state = State.PAUSED;
             }
         }
         
@@ -53,9 +59,8 @@ public class ControlUnit extends SimulationThread {
             workingStates.remove(WorkingState.PUMPING_INSIDE);
             workingStates.add(WorkingState.WASHING);
             washingController.send(new WorkingStateMessage(WorkingStateMessage.Activity.START));
-            washingRemainingTime = currentStage == WashingStage.WASHING ? currentProgram.getWashingTime() : currentProgram.getRinsingTime();
-            washingStartedTime = getSimulationTime();
-            scheduleMessage(new WashingFinishedMessage(), washingRemainingTime);
+            operationRemainingTime = currentStage == WashingStage.WASHING ? currentProgram.getWashingTime() : currentProgram.getRinsingTime();
+            scheduleMessageWithTime(new WashingFinishedMessage(), operationRemainingTime);
         }
         
         if(workingStates.containsAll(Arrays.asList(WorkingState.HEATING, WorkingState.WASHING)) && msg instanceof WashingFinishedMessage) {
@@ -72,10 +77,10 @@ public class ControlUnit extends SimulationThread {
             if(currentStage != WashingStage.RINSING) {
                 currentStage = WashingStage.RINSING;
                 workingStates.add(WorkingState.INIT_WASHING);
-                scheduleMessage(new InitFinishedMessage(), 10);
+                scheduleMessageWithTime(new InitFinishedMessage(), INIT_TIME);
             } else {
                 washingController.send(new WorkingStateMessage(WorkingStateMessage.Activity.START));
-                scheduleMessage(new WashingFinishedMessage(), currentProgram.getSpinningTime());
+                scheduleMessageWithTime(new WashingFinishedMessage(), currentProgram.getSpinningTime());
                 workingStates.add(WorkingState.SPINNING);
             }
         }
@@ -83,7 +88,7 @@ public class ControlUnit extends SimulationThread {
         if(workingStates.contains(WorkingState.SPINNING)  && msg instanceof WashingFinishedMessage) {
             workingStates.clear();
             workingStates.add(WorkingState.WAITING_AFTER_WASHING);
-            scheduleMessage(new WaitingFinishedMessage(), WAITING_AFTER_WASHING_TIME);
+            scheduleMessageWithTime(new WaitingFinishedMessage(), WAITING_AFTER_WASHING_TIME);
         }
         
         if(workingStates.contains(WorkingState.WAITING_AFTER_WASHING) && msg instanceof WaitingFinishedMessage) {
@@ -93,6 +98,33 @@ public class ControlUnit extends SimulationThread {
         }
     }
 
+    private void scheduleMessageWithTime(Message msg, double time) {
+        operationStartedTime = getSimulationTime();
+        operationElapsedTime = 0.;
+        scheduleMessage(msg, time);
+    }
+
+    private void computeRemainingOperationTime() {
+        operationElapsedTime = getSimulationTime() - operationStartedTime;
+        
+        if(workingStates.contains(WorkingState.INIT_WASHING)) {
+            operationRemainingTime = INIT_TIME - operationElapsedTime;
+        } else if(workingStates.contains(WorkingState.WASHING)) {
+            operationRemainingTime = currentStage == WashingStage.WASHING ? currentProgram.getWashingTime() : currentProgram.getRinsingTime();
+        } else if(workingStates.contains(WorkingState.SPINNING)) {
+            operationRemainingTime = currentProgram.getSpinningTime();
+        }
+    }
+
+    private void stopWashing() throws InterruptedException {
+        clearScheduledMessages();
+        workingStates.clear();
+        washingController.send(new WorkingStateMessage(WorkingStateMessage.Activity.STOP));
+        tempController.send(new TemperatureControllerMessage(0, WorkingStateMessage.Activity.STOP));
+        washingMachine.getWaterLevelSensor().send(new GetMeasurementMessage(this));
+        state = State.STOPPING;
+    }
+
     private void processStopedState(Message msg) throws InterruptedException {
         if(msg instanceof ControlUnitMessage) {
             ControlUnitMessage cuMessage = (ControlUnitMessage) msg;
@@ -100,6 +132,9 @@ public class ControlUnit extends SimulationThread {
                 washingMachine.getDoor().send(new DoorControlMessage(DoorControlMessage.Activity.LOCK));
                 workingStates.clear();
                 workingStates.add(WorkingState.INIT_WASHING);
+                operationStartedTime = getSimulationTime();
+                scheduleMessage(new InitFinishedMessage(), INIT_TIME);
+                currentStage = WashingStage.WASHING;
                 state = State.WORKING;
             }
         }
@@ -114,6 +149,40 @@ public class ControlUnit extends SimulationThread {
         if(msg instanceof PumpingFinishedMessage) {
             washingMachine.getDoor().send(new DoorControlMessage(DoorControlMessage.Activity.UNLOCK));
             state = State.STOPPED;
+        }
+    }
+
+    private void processPausedState(Message msg) throws InterruptedException {
+        if(msg instanceof ControlUnitMessage) {
+            ControlUnitMessage cuMessage = (ControlUnitMessage) msg;
+            if(cuMessage.getActivity() == ControlUnitMessage.Activity.STOP) {
+                stopWashing();
+            }
+            if(cuMessage.getActivity() == ControlUnitMessage.Activity.START) {
+                if(workingStates.contains(WorkingState.INIT_WASHING)) {
+                    scheduleMessage(new InitFinishedMessage(), operationRemainingTime);
+                }                 
+                if(workingStates.contains(WorkingState.PUMPING_INSIDE)) {
+                    pumpController.send(new PumpControllerMessage(Pump.Direction.INSIDE, WorkingStateMessage.Activity.START));
+                }
+                if(workingStates.contains(WorkingState.HEATING)) {
+                    tempController.send(new TemperatureControllerMessage(currentProgram.getTemperature(), WorkingStateMessage.Activity.START));
+                }
+                if(workingStates.contains(WorkingState.WASHING)) {
+                    washingController.send(new WorkingStateMessage(WorkingStateMessage.Activity.START));
+                    scheduleMessage(new WashingFinishedMessage(), operationRemainingTime);
+                }
+                if(workingStates.contains(WorkingState.PUMPING_OUTSIDE)) {
+                    pumpController.send(new PumpControllerMessage(Pump.Direction.OUTSIDE, WorkingStateMessage.Activity.START));                    
+                }
+                if(workingStates.contains(WorkingState.SPINNING)) {
+                    washingController.send(new WorkingStateMessage(WorkingStateMessage.Activity.START));
+                    scheduleMessage(new WashingFinishedMessage(), operationRemainingTime);                    
+                }
+                if(workingStates.contains(WorkingState.WAITING_AFTER_WASHING)) {
+                    scheduleMessage(new WaitingFinishedMessage(), operationRemainingTime);
+                }
+            }
         }
     }
 
@@ -164,6 +233,7 @@ public class ControlUnit extends SimulationThread {
                 case WORKING:
                     processWorkingState(msg);
                 case PAUSED:
+                    processPausedState(msg);
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(ControlUnit.class.getName()).log(Level.SEVERE, null, ex);
