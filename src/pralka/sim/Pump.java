@@ -8,7 +8,7 @@ import pralka.msg.PumpControlMessage;
 
 public class Pump extends SimulationThread {
 
-    private static enum State {
+    public static enum State {
 
         STOPPED,
         PUMPING_INSIDE,
@@ -28,6 +28,12 @@ public class Pump extends SimulationThread {
         this.environment = environment;
         this.state = State.STOPPED;
     }
+
+    public State getPumpState() {
+        return state;
+    }
+    
+    
 
     @Override
     protected void simulationStep() {

@@ -34,6 +34,8 @@ public class Environment extends SimulationThread {
         try {
             if (waterLevel + delta <= WATER_HIGH_LEVEL) {
                 waterLevel += delta;
+            } else {
+                waterLevel = WATER_HIGH_LEVEL;
             }
         } finally {
             waterLevelLock.writeLock().unlock();
@@ -45,6 +47,8 @@ public class Environment extends SimulationThread {
         try {
             if (waterLevel - delta >= WATER_LOW_LEVEL) {
                 waterLevel -= delta;
+            } else {
+                waterLevel = WATER_LOW_LEVEL;
             }
         } finally {
             waterLevelLock.writeLock().unlock();
@@ -55,7 +59,7 @@ public class Environment extends SimulationThread {
     private double waterTemperature = 20.;
     private ReadWriteLock waterTemperatureLock = new ReentrantReadWriteLock();
     private double heatingPower;
-    private static final double TIME_CONSTANT = 1;
+    private static final double TIME_CONSTANT = 10;
     // temperatura pokojowa
     private static final double COOLING_POWER = 20;
 

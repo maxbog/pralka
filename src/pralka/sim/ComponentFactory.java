@@ -34,7 +34,10 @@ public class ComponentFactory {
     }
     
     public ControlUnit createControlUnit(WashingMachine washingMachine) {
-        return simulation.registeringThread(new ControlUnit(washingMachine));
+        TemperatureController tempCtrl = simulation.registeringThread(new TemperatureController(washingMachine.getTemperatureSensor(), washingMachine.getHeater()));
+        PumpController pumpCtrl = simulation.registeringThread(new PumpController(washingMachine.getWaterLevelSensor(), washingMachine.getPump()));
+        WashingController washingCtrl = simulation.registeringThread(new WashingController(washingMachine.getMotor()));
+        return simulation.registeringThread(new ControlUnit(pumpCtrl, tempCtrl, washingCtrl, washingMachine));
     }
     
     public Programmer createProgrammer(WashingMachine washingMachine) {

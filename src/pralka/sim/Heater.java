@@ -7,18 +7,24 @@ import pralka.msg.Message;
 
 public class Heater extends SimulationThread {
 
-    private static enum State {
+    public static enum State {
 
         STOPPED,
         HEATING
     }
-    private static final double HEATING_POWER = 10000.;
+    private static final double HEATING_POWER = 100.;
     private Environment environment;
     private State state = State.STOPPED;
 
     public Heater(Environment environment) {
         this.environment = environment;
     }
+
+    public State getHeaterState() {
+        return state;
+    }
+    
+    
 
     @Override
     protected synchronized void simulationStep() {

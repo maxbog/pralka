@@ -23,11 +23,15 @@ public class PumpController extends SimulationThread {
     private WaterLevelSensor waterLevelSensor;
     private Pump pump;
 
-    public PumpController(ControlUnit controlUnit, WaterLevelSensor waterLevelSensor, Pump pump) {
-        this.controlUnit = controlUnit;
+    public PumpController(WaterLevelSensor waterLevelSensor, Pump pump) {
         this.waterLevelSensor = waterLevelSensor;
         this.pump = pump;
     }
+
+    public void setControlUnit(ControlUnit controlUnit) {
+        this.controlUnit = controlUnit;
+    }    
+    
 
     @Override
     protected void simulationStep() {

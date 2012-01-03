@@ -3,10 +3,10 @@ package pralka.ui;
 import com.jgoodies.binding.PresentationModel;
 import com.jgoodies.binding.adapter.Bindings;
 import com.jgoodies.binding.value.ConverterFactory;
-import java.text.Format;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.NumberFormat;
-import pralka.sim.ComponentFactory;
-import pralka.sim.Environment;
+import javax.swing.Timer;
 import pralka.sim.Programmer;
 import pralka.sim.Simulation;
 import pralka.sim.WashingMachine;
@@ -14,15 +14,17 @@ import pralka.sim.WashingMachine;
 public class UserInterfacePanel extends javax.swing.JPanel {
 
     WashingMachine washingMachine;
+    Simulation simulation;
     
     /** Creates new form UserInterfacePanel */
     public UserInterfacePanel() {
         initComponents();
-        
-        washingMachine = new WashingMachine(new ComponentFactory(new Environment(), new Simulation()));
-        
-        initDataBindings();
     }
+
+    public void setWashingMachine(WashingMachine washingMachine) {
+        this.washingMachine = washingMachine;
+        initDataBindings();
+    }    
     
     private void initDataBindings() {
         PresentationModel<Programmer> model = new PresentationModel<Programmer>(washingMachine.getProgrammer());
@@ -73,10 +75,16 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         rbtnHandWash = new javax.swing.JRadioButton();
         rbtnCustom = new javax.swing.JRadioButton();
         chkAdditionalWash = new javax.swing.JCheckBox();
+        btnStop = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
         btnStart.setText("Start");
+        btnStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStartActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -84,6 +92,11 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         add(btnStart, gridBagConstraints);
 
         btnPause.setText("Pauza");
+        btnPause.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPauseActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -258,16 +271,41 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weighty = 1.0;
         add(jPanel1, gridBagConstraints);
+
+        btnStop.setText("Stop");
+        btnStop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStopActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        add(btnStop, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnTemperatureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTemperatureActionPerformed
         washingMachine.getProgrammer().changeTemperature();
     }//GEN-LAST:event_btnTemperatureActionPerformed
 
+    private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
+        washingMachine.getProgrammer().startWashing();
+    }//GEN-LAST:event_btnStartActionPerformed
+
+    private void btnPauseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPauseActionPerformed
+        washingMachine.getProgrammer().pauseWashing();
+    }//GEN-LAST:event_btnPauseActionPerformed
+
+    private void btnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopActionPerformed
+        washingMachine.getProgrammer().stopWashing();
+    }//GEN-LAST:event_btnStopActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnPause;
     private javax.swing.JButton btnSpeed;
     private javax.swing.JButton btnStart;
+    private javax.swing.JButton btnStop;
     private javax.swing.JButton btnTemperature;
     private javax.swing.JButton btnWashingTime;
     private javax.swing.JCheckBox chkAdditionalWash;

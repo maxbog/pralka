@@ -13,11 +13,7 @@ package pralka.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.Timer;
-import pralka.sim.Environment;
-import pralka.sim.Heater;
 import pralka.sim.Simulation;
-import pralka.sim.TemperatureController;
-import pralka.sim.TemperatureSensor;
 
 /**
  *
@@ -26,21 +22,21 @@ import pralka.sim.TemperatureSensor;
 public class MainFrame extends javax.swing.JFrame {
 
     Timer timer;
-    Simulation sim;
+    Simulation simulation;
     /** Creates new form MainFrame */
     public MainFrame() {
         initComponents();
-        sim = new Simulation();
-        sim.start();
-        timer = new Timer(200, new ActionListener() {
+        simulation = new Simulation();
+        simulation.start();
+        userInterfacePanel1.setWashingMachine(simulation.getWashingMachine());
+        timer = new Timer(100, new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                jTextField1.setText(Double.toString(sim.getEnvironment().getWaterLevel()));
-            }            
+                washingMachineStatePanel1.updateState(simulation);
+            }
         });
-        timer.setRepeats(true);
-        timer.start();
+        timer.start();   
     }
 
     /** This method is called from within the constructor to
@@ -53,29 +49,12 @@ public class MainFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         userInterfacePanel1 = new pralka.ui.UserInterfacePanel();
-        jTextField1 = new javax.swing.JTextField();
+        washingMachineStatePanel1 = new pralka.ui.WashingMachineStatePanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jTextField1.setText("jTextField1");
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(userInterfacePanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 830, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(754, 754, 754))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(userInterfacePanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(86, 86, 86)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
+        getContentPane().setLayout(new java.awt.GridLayout(2, 1));
+        getContentPane().add(userInterfacePanel1);
+        getContentPane().add(washingMachineStatePanel1);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -116,7 +95,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField jTextField1;
     private pralka.ui.UserInterfacePanel userInterfacePanel1;
+    private pralka.ui.WashingMachineStatePanel washingMachineStatePanel1;
     // End of variables declaration//GEN-END:variables
 }

@@ -21,22 +21,10 @@ public class Simulation {
 
     public Simulation() {
         timer = new Timer();
+        timer.start();
         threads = new ArrayList<SimulationThread>();
         environment = registeringThread(new Environment());
-        sensor = registeringThread(new WaterLevelSensor(environment));
-        pump = registeringThread(new Pump(environment));
-        washingMachine = new WashingMachine(new ComponentFactory(new Environment(), this));
-        controlUnit = new ControlUnit(washingMachine);
-        pumpCtrl = registeringThread(new PumpController(controlUnit, sensor, pump));
-        timer.resumeTimer();
-        timer.start();
-        try {
-            pumpCtrl.send(new PumpControllerMessage(Pump.Direction.INSIDE, Activity.START));
-            //washingMachine = new WashingMachine(new ComponentFactory(environment, this));
-            
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
-        }        
+        washingMachine = new WashingMachine(new ComponentFactory(environment, this));
     }
     
     public final <T extends SimulationThread> T registeringThread(T thread) {
@@ -47,6 +35,10 @@ public class Simulation {
 
     public Environment getEnvironment() {
         return environment;
+    }
+
+    public WashingMachine getWashingMachine() {
+        return washingMachine;
     }
     
     

@@ -31,10 +31,18 @@ public class Motor extends SimulationThread {
         SPINNING,
         STOPPED
     }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public State getMotorState() {
+        return state;
+    }
     
     private int speed;
-    private Direction direction;
-    private State state;
+    private Direction direction = Direction.LEFT;
+    private State state = State.STOPPED;
 
     @Override
     protected void simulationStep() {

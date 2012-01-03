@@ -57,6 +57,8 @@ public class WashingMachine extends Model {
         return motor;
     }
     
+    
+    
     //<editor-fold defaultstate="collapsed" desc="Property - status">
     public static final String PROPERTYNAME_STATUS = "status";
     private String status;

@@ -19,6 +19,12 @@ public class WashingController extends SimulationThread {
     private State state;
     private Motor motor;
 
+    public WashingController(Motor motor) {
+        this.motor = motor;
+    }
+    
+    
+
     @Override
     protected void simulationStep() {
         try {
@@ -33,6 +39,7 @@ public class WashingController extends SimulationThread {
                         break;
                     case STOP:
                         clearScheduledMessages();
+                        motor.send(new MotorControlMessage(null, WorkingStateMessage.Activity.STOP));
                         state = State.NOT_WASHING;
                         break;
                 }

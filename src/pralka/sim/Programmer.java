@@ -63,6 +63,23 @@ public class Programmer extends Model {
             Logger.getLogger(Programmer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public void stopWashing() {
+        try {
+            washingMachine.getControlUnit().send(new ControlUnitMessage(ControlUnitMessage.Activity.STOP, null));
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Programmer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void pauseWashing() {
+        try {
+            washingMachine.getControlUnit().send(new ControlUnitMessage(ControlUnitMessage.Activity.PAUSE, null));
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Programmer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     private Program customProgram = new Program();
     //<editor-fold defaultstate="collapsed" desc="Property - additionalWash">
     public static final String PROPERTYNAME_ADDITIONAL_WASH = "additionalWash";
