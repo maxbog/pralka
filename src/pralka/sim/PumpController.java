@@ -11,6 +11,7 @@ import pralka.msg.WaterLevelMessage;
 import pralka.msg.WorkingStateMessage.Activity;
 
 public class PumpController extends SimulationThread {
+    private static final double MEASUREMENT_PERIOD = 0.1;
 
     private static enum State {
         PUMPING_INSIDE,
@@ -37,16 +38,18 @@ public class PumpController extends SimulationThread {
                     case START:
                         if (((PumpControllerMessage) msg).getDirection() == Pump.Direction.INSIDE) {
                             state = State.PUMPING_INSIDE;
-                            pump.getMessageQueue().put(new PumpControlMessage(Activity.START, Pump.Direction.INSIDE));
+                            pump.send(new PumpControlMessage(Activity.STOP, null));
+                            pump.send(new PumpControlMessage(Activity.START, Pump.Direction.INSIDE));
                         } else {
                             state = State.PUMPING_OUTSIDE;
-                            pump.getMessageQueue().put(new PumpControlMessage(Activity.START, Pump.Direction.OUTSIDE));
+                            pump.send(new PumpControlMessage(Activity.STOP, null));
+                            pump.send(new PumpControlMessage(Activity.START, Pump.Direction.OUTSIDE));
                         }
-                        scheduleMessage(new GetMeasurementMessage(this), waterLevelSensor, 0.1);
+                        waterLevelSensor.scheduleMessage(new GetMeasurementMessage(this), MEASUREMENT_PERIOD);
                         break;
                     case STOP:
                         state = State.NOT_PUMPING;
-                        pump.getMessageQueue().put(new PumpControlMessage(Activity.STOP, null));
+                        pump.send(new PumpControlMessage(Activity.STOP, null));
                         break;
                 }
             }
@@ -55,10 +58,10 @@ public class PumpController extends SimulationThread {
                 WaterLevelMessage wlMsg = (WaterLevelMessage) msg;
                 if ((state == State.PUMPING_INSIDE && wlMsg.isAboveHighLevel()) || (state == State.PUMPING_OUTSIDE && !wlMsg.isAboveLowLevel())) {
                     state = State.NOT_PUMPING;
-                    pump.getMessageQueue().put(new PumpControlMessage(Activity.STOP, null));
-                    controlUnit.getMessageQueue().put(new PumpingFinishedMessage());
+                    pump.send(new PumpControlMessage(Activity.STOP, null));
+                    controlUnit.send(new PumpingFinishedMessage());
                 }
-                scheduleMessage(new GetMeasurementMessage(this), waterLevelSensor, .1);
+                waterLevelSensor.scheduleMessage(new GetMeasurementMessage(this), MEASUREMENT_PERIOD);
             }
 
         } catch (InterruptedException ex) {

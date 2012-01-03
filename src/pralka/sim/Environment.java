@@ -87,7 +87,6 @@ public class Environment extends SimulationThread {
         }
     }
     //</editor-fold>      
-    private User user;
 
     @Override
     public void run() {

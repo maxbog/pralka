@@ -19,7 +19,7 @@ public class TemperatureSensor extends SimulationThread {
         try {
             Message msg = messageQueue.take();
             if(msg instanceof GetMeasurementMessage) {
-                ((GetMeasurementMessage)msg).getReturnThread().getMessageQueue().put(new TemperatureMessage(environment.getWaterTemperature()));
+                ((GetMeasurementMessage)msg).getReturnThread().send(new TemperatureMessage(environment.getWaterTemperature()));
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(TemperatureSensor.class.getName()).log(Level.SEVERE, null, ex);

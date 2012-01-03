@@ -21,7 +21,7 @@ public class WaterLevelSensor extends SimulationThread {
         try {
             Message msg = messageQueue.take();
             if(msg instanceof GetMeasurementMessage) {
-                ((GetMeasurementMessage)msg).getReturnThread().getMessageQueue().put(new WaterLevelMessage(environment.getWaterLevel() >= HIGH_LEVEL, environment.getWaterLevel() >= LOW_LEVEL));
+                ((GetMeasurementMessage)msg).getReturnThread().send(new WaterLevelMessage(environment.getWaterLevel() >= HIGH_LEVEL, environment.getWaterLevel() >= LOW_LEVEL));
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(TemperatureSensor.class.getName()).log(Level.SEVERE, null, ex);

@@ -181,7 +181,7 @@ public class Timer extends Thread {
                     ScheduledMessage msg = scheduledMessages.poll();
                     if (msg != null) {
                         if (msg.getTime() <= getCurrentTime()) {
-                            msg.getDestination().getMessageQueue().put(msg.getMessage());
+                            msg.getDestination().send(msg.getMessage());
                         } else {
                             scheduledMessages.offer(msg);
                         }

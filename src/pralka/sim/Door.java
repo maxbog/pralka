@@ -1,16 +1,36 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package pralka.sim;
 
-public class Door {
-    
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import pralka.msg.DoorControlMessage;
+import pralka.msg.Message;
+
+public class Door extends SimulationThread {
+
+    private void handleDoorControlMessage(DoorControlMessage msg) {
+        switch (msg.getActivity()) {
+            case OPEN:
+                if (lockState == LockState.UNLOCKED) {
+                    state = State.OPENED;
+                }
+                break;
+            case CLOSE:
+                state = State.CLOSED;
+                break;
+            case LOCK:
+                lockState = LockState.LOCKED;
+                break;
+            case UNLOCK:
+                lockState = LockState.UNLOCKED;
+                break;
+        }
+    }
+
     private static enum LockState {
         LOCKED,
         UNLOCKED
     }
-    
+
     private static enum State {
         OPENED,
         CLOSED
@@ -18,29 +38,20 @@ public class Door {
     
     private State state;
     private LockState lockState;
-    
-    public boolean opened() {
-        return ( state == State.OPENED );
+
+    public boolean isOpen() {
+        return (state == State.OPENED);
     }
-       
-    public boolean open() {
-        if (lockState == LockState.UNLOCKED) {
-            state = State.OPENED;
-            return true;
+
+    @Override
+    protected void simulationStep() {
+        try {
+            Message msg = messageQueue.take();
+            if (msg instanceof DoorControlMessage) {
+                handleDoorControlMessage((DoorControlMessage) msg);
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(PumpController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        else
-            return false;
-    }    
-     
-    public void close() {
-         state = State.CLOSED;
-     }
-     
-    public void lock() {
-         lockState = LockState.LOCKED;
-     }
-     
-    public void unlock() {
-         lockState = LockState.UNLOCKED;
-     }
+    }
 }

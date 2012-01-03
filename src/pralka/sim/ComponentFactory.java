@@ -18,11 +18,11 @@ public class ComponentFactory {
     }
     
     public Door createDoor() {
-        return new Door();
+        return simulation.registeringThread(new Door());
     }
     
     public Motor createMotor() {
-        return new Motor();
+        return simulation.registeringThread(new Motor());
     }
     
     public TemperatureSensor createTemperatureSensor() {

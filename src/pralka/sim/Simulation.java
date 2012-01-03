@@ -31,7 +31,7 @@ public class Simulation {
         timer.resumeTimer();
         timer.start();
         try {
-            pumpCtrl.getMessageQueue().put(new PumpControllerMessage(Pump.Direction.INSIDE, Activity.START));
+            pumpCtrl.send(new PumpControllerMessage(Pump.Direction.INSIDE, Activity.START));
             //washingMachine = new WashingMachine(new ComponentFactory(environment, this));
             
         } catch (InterruptedException ex) {

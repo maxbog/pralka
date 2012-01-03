@@ -8,7 +8,7 @@ import pralka.msg.Message;
 
 public class SimulationThread extends Thread {
 
-    private Simulation simulation;
+    protected Simulation simulation;
     private double simulationTime;
     private double timeDelta;
     private boolean shouldStop = false;
@@ -33,15 +33,21 @@ public class SimulationThread extends Thread {
     }
     
     public void stopThread() {
-        shouldStop = true;
+        try {
+            shouldStop = true;
+            // puszczamy dowolną wiadomość, żeby warunek był ponownie sprawdzony
+            send(new Message());
+        } catch (InterruptedException ex) {
+            Logger.getLogger(SimulationThread.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void setSimulation(Simulation simulation) {
         this.simulation = simulation;
     }
-
-    public BlockingQueue<Message> getMessageQueue() {
-        return messageQueue;
+    
+    public void send(Message msg) throws InterruptedException {
+        messageQueue.put(msg);
     }
     
     @Override
@@ -55,7 +61,7 @@ public class SimulationThread extends Thread {
         
     }
     
-    protected void scheduleMessage(Message msg, SimulationThread destination, double time) {
-        simulation.scheduleMessage(msg, destination, time);
+    protected void scheduleMessage(Message msg, double time) {
+        simulation.scheduleMessage(msg, this, time);
     }
 }

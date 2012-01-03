@@ -9,6 +9,7 @@ import pralka.msg.TemperatureControllerMessage;
 import pralka.msg.TemperatureMessage;
 
 public class TemperatureController extends SimulationThread {
+    private static final double MEASUREMENT_PERIOD = 0.1;
 
     private final double EPSILON = 2.;
 
@@ -43,7 +44,7 @@ public class TemperatureController extends SimulationThread {
                 switch (((TemperatureControllerMessage) msg).getActivity()) {
                     case START:
                         setTemperature = ((TemperatureControllerMessage) msg).getTargetTemperature();
-                        scheduleMessage(new GetMeasurementMessage(this), temperatureSensor, 1);
+                        temperatureSensor.scheduleMessage(new GetMeasurementMessage(this), MEASUREMENT_PERIOD);
                         state = State.ON;
                         break;
                     case STOP:
@@ -58,17 +59,17 @@ public class TemperatureController extends SimulationThread {
                     case HEATER_ON:
                         if (setTemperature + EPSILON < currentTemp) {
                             heatingState = HeatingState.HEATER_OFF;
-                            heater.getMessageQueue().put(new WorkingStateMessage(WorkingStateMessage.Activity.STOP));
+                            heater.send(new WorkingStateMessage(WorkingStateMessage.Activity.STOP));
                         }
                         break;
                     case HEATER_OFF:
                         if (setTemperature - EPSILON > currentTemp) {
                             heatingState = HeatingState.HEATER_ON;
-                            heater.getMessageQueue().put(new WorkingStateMessage(WorkingStateMessage.Activity.START));
+                            heater.send(new WorkingStateMessage(WorkingStateMessage.Activity.START));
                         }
                         break;
                 }
-                scheduleMessage(new GetMeasurementMessage(this), temperatureSensor, 1);
+                temperatureSensor.scheduleMessage(new GetMeasurementMessage(this), MEASUREMENT_PERIOD);
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(TemperatureController.class.getName()).log(Level.SEVERE, null, ex);
