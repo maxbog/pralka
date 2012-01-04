@@ -4,6 +4,9 @@ import com.jgoodies.binding.PresentationModel;
 import com.jgoodies.binding.adapter.Bindings;
 import com.jgoodies.binding.value.ConverterFactory;
 import java.text.NumberFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import pralka.msg.DoorControlMessage;
 import pralka.sim.Programmer;
 import pralka.sim.Simulation;
 import pralka.sim.WashingMachine;
@@ -80,6 +83,8 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         rbtnCustom = new javax.swing.JRadioButton();
         chkAdditionalWash = new javax.swing.JCheckBox();
         btnStop = new javax.swing.JButton();
+        btnDoor = new javax.swing.JButton();
+        btnCloseDoor = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -281,7 +286,7 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridheight = 4;
+        gridBagConstraints.gridheight = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weighty = 1.0;
         add(jPanel1, gridBagConstraints);
@@ -297,6 +302,30 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         add(btnStop, gridBagConstraints);
+
+        btnDoor.setText("Otwórz drzwi");
+        btnDoor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDoorActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        add(btnDoor, gridBagConstraints);
+
+        btnCloseDoor.setText("Zamknij drzwi");
+        btnCloseDoor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCloseDoorActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        add(btnCloseDoor, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnTemperatureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTemperatureActionPerformed
@@ -323,7 +352,25 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         washingMachine.getProgrammer().changeTime();
     }//GEN-LAST:event_btnWashingTimeActionPerformed
 
+    private void btnDoorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoorActionPerformed
+        try {
+            washingMachine.getDoor().send(new DoorControlMessage(DoorControlMessage.Activity.OPEN));
+        } catch (InterruptedException ex) {
+            Logger.getLogger(UserInterfacePanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnDoorActionPerformed
+
+    private void btnCloseDoorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseDoorActionPerformed
+        try {
+            washingMachine.getDoor().send(new DoorControlMessage(DoorControlMessage.Activity.CLOSE));
+        } catch (InterruptedException ex) {
+            Logger.getLogger(UserInterfacePanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnCloseDoorActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCloseDoor;
+    private javax.swing.JButton btnDoor;
     private javax.swing.JButton btnPause;
     private javax.swing.JButton btnSpeed;
     private javax.swing.JButton btnStart;

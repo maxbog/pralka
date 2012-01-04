@@ -55,6 +55,8 @@ public class WashingMachineStatePanel extends javax.swing.JPanel {
         lblSimulationTime.setText(Double.toString(simulation.getCurrentTime()));
         lblState.setText(washingMachine.getControlUnit().getControlUnitState() == null ? "" : washingMachine.getControlUnit().getControlUnitState().toString());
         lblStage.setText(washingMachine.getControlUnit().getCurrentStage() == null ? "" : washingMachine.getControlUnit().getCurrentStage().toString());
+        lblLockState.setText(washingMachine.getDoor().getLockState() == null ? "" : washingMachine.getDoor().getLockState().toString());
+        lblDoorState.setText(washingMachine.getDoor().getDoorState() == null ? "" : washingMachine.getDoor().getDoorState().toString());
     }
 
     /** This method is called from within the constructor to
@@ -90,6 +92,10 @@ public class WashingMachineStatePanel extends javax.swing.JPanel {
         spnTimeScale = new javax.swing.JSpinner();
         jLabel8 = new javax.swing.JLabel();
         lblSimulationTime = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        lblLockState = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        lblDoorState = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -114,7 +120,7 @@ public class WashingMachineStatePanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 11;
+        gridBagConstraints.gridheight = 13;
         gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
@@ -268,6 +274,32 @@ public class WashingMachineStatePanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         add(lblSimulationTime, gridBagConstraints);
+
+        jLabel11.setText("Stan zamka drzwi:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.ipadx = 10;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        add(jLabel11, gridBagConstraints);
+
+        lblLockState.setText("jLabel12");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        add(lblLockState, gridBagConstraints);
+
+        jLabel13.setText("Stan drzwi:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.ipadx = 10;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        add(jLabel13, gridBagConstraints);
+
+        lblDoorState.setText("jLabel14");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        add(lblDoorState, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void spnTimeScaleStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnTimeScaleStateChanged
@@ -278,6 +310,8 @@ public class WashingMachineStatePanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -288,7 +322,9 @@ public class WashingMachineStatePanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblDoorState;
     private javax.swing.JLabel lblHeaterState;
+    private javax.swing.JLabel lblLockState;
     private javax.swing.JLabel lblMotorState;
     private javax.swing.JLabel lblPumpState;
     private javax.swing.JLabel lblSimulationTime;

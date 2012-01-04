@@ -26,22 +26,32 @@ public class Door extends SimulationThread {
         }
     }
 
-    private static enum LockState {
+    public static enum LockState {
         LOCKED,
         UNLOCKED
     }
 
-    private static enum State {
+    public static enum State {
         OPENED,
         CLOSED
     }
     
-    private State state;
-    private LockState lockState;
+    private State state = State.CLOSED;
+    private LockState lockState = LockState.UNLOCKED;
 
     public boolean isOpen() {
         return (state == State.OPENED);
     }
+
+    public LockState getLockState() {
+        return lockState;
+    }
+
+    public State getDoorState() {
+        return state;
+    }
+    
+    
 
     @Override
     protected void simulationStep() {

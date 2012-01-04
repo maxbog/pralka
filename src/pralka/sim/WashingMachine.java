@@ -76,5 +76,4 @@ public class WashingMachine extends Model {
     }
     //</editor-fold>
     
-    
 }
