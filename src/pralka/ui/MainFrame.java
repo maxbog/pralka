@@ -1,13 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * MainFrame.java
- *
- * Created on 2011-12-09, 23:34:39
- */
 package pralka.ui;
 
 import java.awt.event.ActionEvent;
@@ -15,10 +5,6 @@ import java.awt.event.ActionListener;
 import javax.swing.Timer;
 import pralka.sim.Simulation;
 
-/**
- *
- * @author Max
- */
 public class MainFrame extends javax.swing.JFrame {
 
     Timer timer;

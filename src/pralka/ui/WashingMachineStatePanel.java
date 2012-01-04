@@ -1,13 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * WashingMachineStatePanel.java
- *
- * Created on 2012-01-03, 17:05:31
- */
 package pralka.ui;
 
 import javax.swing.DefaultListModel;
@@ -18,10 +8,6 @@ import pralka.sim.Motor;
 import pralka.sim.Simulation;
 import pralka.sim.WashingMachine;
 
-/**
- *
- * @author Max
- */
 public class WashingMachineStatePanel extends javax.swing.JPanel {
 
     private static Icon iconDoorOpen;
