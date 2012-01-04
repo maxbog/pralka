@@ -27,6 +27,10 @@ public class Simulation {
         washingMachine = new WashingMachine(new ComponentFactory(environment, this));
     }
     
+    public void setTimeScale(double timeScale) {
+        timer.setTimeScale(timeScale);
+    }
+    
     public final <T extends SimulationThread> T registeringThread(T thread) {
         thread.setSimulation(this);
         threads.add(thread);

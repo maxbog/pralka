@@ -49,6 +49,8 @@ public class TemperatureController extends SimulationThread {
                         break;
                     case STOP:
                         clearScheduledMessages();
+                        heater.send(new WorkingStateMessage(WorkingStateMessage.Activity.STOP));
+                        heatingState = HeatingState.HEATER_OFF;
                         state = State.OFF;
                         break;
                 }

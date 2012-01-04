@@ -29,11 +29,12 @@ public class MainFrame extends javax.swing.JFrame {
         simulation = new Simulation();
         simulation.start();
         userInterfacePanel1.setWashingMachine(simulation.getWashingMachine());
+        washingMachineStatePanel1.setSimulation(simulation);
         timer = new Timer(100, new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                washingMachineStatePanel1.updateState(simulation);
+                washingMachineStatePanel1.updateState();
             }
         });
         timer.start();   
@@ -47,14 +48,38 @@ public class MainFrame extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
+        jPanel1 = new javax.swing.JPanel();
         userInterfacePanel1 = new pralka.ui.UserInterfacePanel();
+        jPanel2 = new javax.swing.JPanel();
         washingMachineStatePanel1 = new pralka.ui.WashingMachineStatePanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        getContentPane().setLayout(new java.awt.GridLayout(2, 1));
-        getContentPane().add(userInterfacePanel1);
-        getContentPane().add(washingMachineStatePanel1);
+        getContentPane().setLayout(new java.awt.GridBagLayout());
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Panel sterownika"));
+        jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.LINE_AXIS));
+        jPanel1.add(userInterfacePanel1);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        getContentPane().add(jPanel1, gridBagConstraints);
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Stan symulacji"));
+        jPanel2.setLayout(new javax.swing.BoxLayout(jPanel2, javax.swing.BoxLayout.LINE_AXIS));
+        jPanel2.add(washingMachineStatePanel1);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        getContentPane().add(jPanel2, gridBagConstraints);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -95,6 +120,8 @@ public class MainFrame extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private pralka.ui.UserInterfacePanel userInterfacePanel1;
     private pralka.ui.WashingMachineStatePanel washingMachineStatePanel1;
     // End of variables declaration//GEN-END:variables

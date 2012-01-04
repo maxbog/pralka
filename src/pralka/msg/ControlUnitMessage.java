@@ -13,11 +13,15 @@ public class ControlUnitMessage extends Message {
     private Activity activity;
     
     private Program chosenProgram;
+    
+    private boolean initialWashing;
 
-    public ControlUnitMessage(Activity activity, Program chosenProgram) {
+    public ControlUnitMessage(Activity activity, Program chosenProgram, boolean initialWashing) {
         this.activity = activity;
         this.chosenProgram = chosenProgram;
+        this.initialWashing = initialWashing;
     }
+
 
     public Activity getActivity() {
         return activity;
@@ -26,4 +30,10 @@ public class ControlUnitMessage extends Message {
     public Program getChosenProgram() {
         return chosenProgram;
     }
+
+    public boolean doInitialWashing() {
+        return initialWashing;
+    }
+    
+    
 }

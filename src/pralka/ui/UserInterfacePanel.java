@@ -3,10 +3,7 @@ package pralka.ui;
 import com.jgoodies.binding.PresentationModel;
 import com.jgoodies.binding.adapter.Bindings;
 import com.jgoodies.binding.value.ConverterFactory;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.NumberFormat;
-import javax.swing.Timer;
 import pralka.sim.Programmer;
 import pralka.sim.Simulation;
 import pralka.sim.WashingMachine;
@@ -41,7 +38,14 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         Bindings.bind(txtTemperature, ConverterFactory.createStringConverter(model.getModel(Programmer.PROPERTYNAME_TEMPERATURE), NumberFormat.getIntegerInstance()));
         txtTemperature.setEditable(false);
         
+        Bindings.bind(txtSpeed, ConverterFactory.createStringConverter(model.getModel(Programmer.PROPERTYNAME_SPEED), NumberFormat.getIntegerInstance()));
+        txtSpeed.setEditable(false);
+        
+        Bindings.bind(txtWashingTime, ConverterFactory.createStringConverter(ConverterFactory.createIntegerConverter(model.getModel(Programmer.PROPERTYNAME_TIME), 1/60.), NumberFormat.getIntegerInstance()));
+        txtWashingTime.setEditable(false);
+        
         Bindings.bind(chkAdditionalWash, model.getModel(Programmer.PROPERTYNAME_ADDITIONAL_WASH));
+        Bindings.bind(chkCradle, model.getModel(Programmer.PROPERTYNAME_CRADLE_MOVES));
         
         Bindings.bind(txtStatus, washingMachineModel.getModel(WashingMachine.PROPERTYNAME_STATUS));
         txtStatus.setEditable(false);
@@ -126,6 +130,11 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         add(btnTemperature, gridBagConstraints);
 
         btnSpeed.setText("Prędkość silnika");
+        btnSpeed.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSpeedActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -151,6 +160,11 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         add(txtSpeed, gridBagConstraints);
 
         btnWashingTime.setText("Czas prania");
+        btnWashingTime.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnWashingTimeActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
@@ -300,6 +314,14 @@ public class UserInterfacePanel extends javax.swing.JPanel {
     private void btnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopActionPerformed
         washingMachine.getProgrammer().stopWashing();
     }//GEN-LAST:event_btnStopActionPerformed
+
+    private void btnSpeedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSpeedActionPerformed
+        washingMachine.getProgrammer().changeSpeed();
+    }//GEN-LAST:event_btnSpeedActionPerformed
+
+    private void btnWashingTimeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnWashingTimeActionPerformed
+        washingMachine.getProgrammer().changeTime();
+    }//GEN-LAST:event_btnWashingTimeActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnPause;

@@ -5,10 +5,12 @@ import java.util.logging.Logger;
 import pralka.msg.ChangeWashingDirectionMessage;
 import pralka.msg.Message;
 import pralka.msg.MotorControlMessage;
+import pralka.msg.WashingControllerMessage;
 import pralka.msg.WorkingStateMessage;
 
 public class WashingController extends SimulationThread {
     public static final int ONE_DIRECTION_TIME = 20;
+    public static final int CRADLE_ONE_DIRECTION_TIME = 1;
 
     private static enum State {
 
@@ -18,24 +20,24 @@ public class WashingController extends SimulationThread {
     }
     private State state;
     private Motor motor;
+    private boolean cradleMoves;
 
     public WashingController(Motor motor) {
         this.motor = motor;
     }
-    
-    
 
     @Override
     protected void simulationStep() {
         try {
             Message msg = messageQueue.take();
-            if (msg instanceof WorkingStateMessage) {
-                switch (((WorkingStateMessage) msg).getActivity()) {
+            if (msg instanceof WashingControllerMessage) {
+                switch (((WashingControllerMessage) msg).getActivity()) {
                     case START:
+                        cradleMoves = ((WashingControllerMessage) msg).doCradleMoves();
                         motor.send(new MotorControlMessage(null, WorkingStateMessage.Activity.STOP));
                         motor.send(new MotorControlMessage(Motor.Direction.LEFT, WorkingStateMessage.Activity.START));
                         state = State.WASH_LEFT;
-                        scheduleMessage(new ChangeWashingDirectionMessage(), ONE_DIRECTION_TIME);
+                        scheduleMessage(new ChangeWashingDirectionMessage(), cradleMoves ? CRADLE_ONE_DIRECTION_TIME : ONE_DIRECTION_TIME);
                         break;
                     case STOP:
                         clearScheduledMessages();
@@ -53,7 +55,7 @@ public class WashingController extends SimulationThread {
                     motor.send(new MotorControlMessage(Motor.Direction.LEFT, WorkingStateMessage.Activity.START));
                     state = State.WASH_LEFT;
                 }
-                scheduleMessage(new ChangeWashingDirectionMessage(), ONE_DIRECTION_TIME);
+                scheduleMessage(new ChangeWashingDirectionMessage(), cradleMoves ? CRADLE_ONE_DIRECTION_TIME : ONE_DIRECTION_TIME);
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(PumpController.class.getName()).log(Level.SEVERE, null, ex);

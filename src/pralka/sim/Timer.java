@@ -138,7 +138,7 @@ public class Timer extends Thread {
             if (paused) {
                 return elapsedTime / (1000. * 1000. * 1000.);
             }
-            return (System.nanoTime() - lastTimeNs + elapsedTime) / (1000. * 1000. * 1000.);
+            return (timeScale*(System.nanoTime() - lastTimeNs) + elapsedTime) / (1000. * 1000. * 1000.);
         } finally {
             timerLock.readLock().unlock();
         }
