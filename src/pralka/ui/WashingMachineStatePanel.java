@@ -10,13 +10,13 @@
  */
 package pralka.ui;
 
-import java.text.NumberFormat;
 import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.SpinnerNumberModel;
-import pralka.sim.ControlUnit;
+import pralka.sim.Motor;
 import pralka.sim.Simulation;
 import pralka.sim.WashingMachine;
-import sun.org.mozilla.javascript.internal.ast.NumberLiteral;
 
 /**
  *
@@ -24,6 +24,18 @@ import sun.org.mozilla.javascript.internal.ast.NumberLiteral;
  */
 public class WashingMachineStatePanel extends javax.swing.JPanel {
 
+    private static Icon iconDoorOpen;
+    private static Icon iconDoorClosed;
+    private static Icon iconRotatingLeft;
+    private static Icon iconRotatingRight;
+    
+    static {
+        iconDoorOpen = new ImageIcon(WashingMachineStatePanel.class.getResource("otwarte.png"));
+        iconDoorClosed = new ImageIcon(WashingMachineStatePanel.class.getResource("zamkniete.png"));
+        iconRotatingLeft = new ImageIcon(WashingMachineStatePanel.class.getResource("zamkniete_lewo.png"));
+        iconRotatingRight = new ImageIcon(WashingMachineStatePanel.class.getResource("zamkniete_prawo.png"));
+    }
+    
     /** Creates new form WashingMachineStatePanel */
     public WashingMachineStatePanel() {
         initComponents();
@@ -57,6 +69,18 @@ public class WashingMachineStatePanel extends javax.swing.JPanel {
         lblStage.setText(washingMachine.getControlUnit().getCurrentStage() == null ? "" : washingMachine.getControlUnit().getCurrentStage().toString());
         lblLockState.setText(washingMachine.getDoor().getLockState() == null ? "" : washingMachine.getDoor().getLockState().toString());
         lblDoorState.setText(washingMachine.getDoor().getDoorState() == null ? "" : washingMachine.getDoor().getDoorState().toString());
+        
+        if(washingMachine.getDoor().isOpen()) {
+            lblImage.setIcon(iconDoorOpen);
+        } else if(washingMachine.getMotor().getMotorState() == Motor.State.SPINNING) {
+            if(washingMachine.getMotor().getDirection() == Motor.Direction.LEFT) {
+                lblImage.setIcon(iconRotatingLeft);
+            } else {
+                lblImage.setIcon(iconRotatingRight);
+            }
+        } else {
+            lblImage.setIcon(iconDoorClosed);
+        }
     }
 
     /** This method is called from within the constructor to
@@ -96,6 +120,7 @@ public class WashingMachineStatePanel extends javax.swing.JPanel {
         lblLockState = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
         lblDoorState = new javax.swing.JLabel();
+        lblImage = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -114,7 +139,7 @@ public class WashingMachineStatePanel extends javax.swing.JPanel {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -300,6 +325,19 @@ public class WashingMachineStatePanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         add(lblDoorState, gridBagConstraints);
+
+        lblImage.setText("jLabel12");
+        lblImage.setMaximumSize(new java.awt.Dimension(400, 400));
+        lblImage.setMinimumSize(new java.awt.Dimension(400, 400));
+        lblImage.setName(""); // NOI18N
+        lblImage.setPreferredSize(new java.awt.Dimension(400, 400));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 13;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(lblImage, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void spnTimeScaleStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spnTimeScaleStateChanged
@@ -324,6 +362,7 @@ public class WashingMachineStatePanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblDoorState;
     private javax.swing.JLabel lblHeaterState;
+    private javax.swing.JLabel lblImage;
     private javax.swing.JLabel lblLockState;
     private javax.swing.JLabel lblMotorState;
     private javax.swing.JLabel lblPumpState;
