@@ -6,6 +6,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import pralka.msg.ChangeStageMessage;
 import pralka.msg.ControlUnitMessage;
 
 public class Programmer extends Model {
@@ -14,6 +15,7 @@ public class Programmer extends Model {
     private static final ArrayList<Integer> predefinedTemperatures;
     private static final ArrayList<Integer> predefinedSpeeds;
     private static final ArrayList<Integer> predefinedTimes;
+
 
     public static enum PredefinedProgram {
 
@@ -125,6 +127,14 @@ public class Programmer extends Model {
     public void pauseWashing() {
         try {
             washingMachine.getControlUnit().send(new ControlUnitMessage(ControlUnitMessage.Activity.PAUSE, null, false));
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Programmer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void nextStage() {
+        try {
+            washingMachine.getControlUnit().send(new ChangeStageMessage());
         } catch (InterruptedException ex) {
             Logger.getLogger(Programmer.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -85,6 +85,7 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         btnStop = new javax.swing.JButton();
         btnDoor = new javax.swing.JButton();
         btnCloseDoor = new javax.swing.JButton();
+        btnNextStage = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -286,7 +287,7 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridheight = 5;
+        gridBagConstraints.gridheight = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weighty = 1.0;
         add(jPanel1, gridBagConstraints);
@@ -326,6 +327,17 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         add(btnCloseDoor, gridBagConstraints);
+
+        btnNextStage.setLabel("Następny etap");
+        btnNextStage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNextStageActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        add(btnNextStage, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnTemperatureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTemperatureActionPerformed
@@ -368,9 +380,14 @@ public class UserInterfacePanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnCloseDoorActionPerformed
 
+    private void btnNextStageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextStageActionPerformed
+        washingMachine.getProgrammer().nextStage();
+    }//GEN-LAST:event_btnNextStageActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCloseDoor;
     private javax.swing.JButton btnDoor;
+    private javax.swing.JButton btnNextStage;
     private javax.swing.JButton btnPause;
     private javax.swing.JButton btnSpeed;
     private javax.swing.JButton btnStart;

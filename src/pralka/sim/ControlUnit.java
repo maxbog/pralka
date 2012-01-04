@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import pralka.msg.ChangeStageMessage;
 import pralka.msg.ControlUnitMessage;
 import pralka.msg.DoorControlMessage;
 import pralka.msg.GetMeasurementMessage;
@@ -81,6 +82,23 @@ public class ControlUnit extends SimulationThread {
                 washingMachine.setStatus("Pauza");
             }
         }
+        
+        if ((msg instanceof WashingFinishedMessage || msg instanceof ChangeStageMessage) && workingStates.contains(WorkingState.SPINNING)) {
+            workingStates.clear();
+            workingStates.add(WorkingState.WAITING_AFTER_WASHING);
+            washingController.send(new WashingControllerMessage(cradleMoves, WorkingStateMessage.Activity.STOP));
+            scheduleMessageWithTime(new WaitingFinishedMessage(), WAITING_AFTER_WASHING_TIME);
+            washingMachine.setStatus("Zaczekaj na odblokowanie drzwi");
+        }
+        
+        if ((msg instanceof ChangeStageMessage || msg instanceof WashingFinishedMessage) && workingStates.containsAll(Arrays.asList(WorkingState.HEATING, WorkingState.WASHING)) ) {            
+            workingStates.clear();
+            workingStates.add(WorkingState.PUMPING_OUTSIDE);
+            tempController.send(new TemperatureControllerMessage(0., WorkingStateMessage.Activity.STOP));
+            washingController.send(new WashingControllerMessage(cradleMoves, WorkingStateMessage.Activity.STOP));
+            pumpController.send(new PumpControllerMessage(Pump.Direction.OUTSIDE, WorkingStateMessage.Activity.START));
+            washingMachine.setStatus("Wypompowywanie wody");
+        }
 
         if (workingStates.contains(WorkingState.INIT_WASHING) && msg instanceof InitFinishedMessage) {
             workingStates.clear();
@@ -96,16 +114,7 @@ public class ControlUnit extends SimulationThread {
             washingController.send(new WashingControllerMessage(cradleMoves, WorkingStateMessage.Activity.START));
             scheduleMessageWithTime(new WashingFinishedMessage(), getStageTime());
             washingMachine.setStatus(getStageStatus());
-        }
-
-        if (workingStates.containsAll(Arrays.asList(WorkingState.HEATING, WorkingState.WASHING)) && msg instanceof WashingFinishedMessage) {
-            workingStates.clear();
-            workingStates.add(WorkingState.PUMPING_OUTSIDE);
-            tempController.send(new TemperatureControllerMessage(0., WorkingStateMessage.Activity.STOP));
-            washingController.send(new WashingControllerMessage(cradleMoves, WorkingStateMessage.Activity.STOP));
-            pumpController.send(new PumpControllerMessage(Pump.Direction.OUTSIDE, WorkingStateMessage.Activity.START));
-            washingMachine.setStatus("Wypompowywanie wody");
-        }
+        }        
 
         if (workingStates.contains(WorkingState.PUMPING_OUTSIDE) && msg instanceof PumpingFinishedMessage) {
             workingStates.clear();
@@ -121,14 +130,6 @@ public class ControlUnit extends SimulationThread {
                 workingStates.add(WorkingState.SPINNING);
                 washingMachine.setStatus("Wirowanie");
             }
-        }
-
-        if (workingStates.contains(WorkingState.SPINNING) && msg instanceof WashingFinishedMessage) {
-            workingStates.clear();
-            workingStates.add(WorkingState.WAITING_AFTER_WASHING);
-            washingController.send(new WashingControllerMessage(cradleMoves, WorkingStateMessage.Activity.STOP));
-            scheduleMessageWithTime(new WaitingFinishedMessage(), WAITING_AFTER_WASHING_TIME);
-            washingMachine.setStatus("Zaczekaj na odblokowanie drzwi");
         }
 
         if (workingStates.contains(WorkingState.WAITING_AFTER_WASHING) && msg instanceof WaitingFinishedMessage) {
